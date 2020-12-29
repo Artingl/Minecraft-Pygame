@@ -25,7 +25,7 @@ class Player:
         self.lastShiftPos = self.position
         self.cameraType = 1
 
-        self.inventory = Inventory(gl)
+        self.inventory = None
 
     def setCameraShake(self):
         if not self.canShake or self.shift != 0:
@@ -55,7 +55,7 @@ class Player:
         DX, DY, DZ = 0, 0, 0
 
         rotY = self.rotation[1] / 180 * math.pi
-        dx, dz = (self.speed + self.acceleration) * math.sin(rotY),\
+        dx, dz = (self.speed + self.acceleration) * math.sin(rotY), \
                  (self.speed + self.acceleration) * math.cos(rotY)
 
         key = pygame.key.get_pressed()
@@ -125,6 +125,18 @@ class Player:
         x, y, z = self.position
         col = self.collide((x + dx, y + dy, z + dz))
         self.canShake = self.position[1] == col[1]
+        # Dynamic FOV
+        '''if self.position[0] != col[0] or self.position[2] != col[2]:
+            if self.gl.fov < FOV + 20:
+                self.gl.fov += 0.2
+            else:
+                self.gl.fov = FOV + 20
+        else:
+            if self.gl.fov > FOV:
+                self.gl.fov -= 0.2
+            else:
+                self.gl.fov = FOV'''
+        #
         if self.shift != 0:
             col2 = roundPos((col[0], col[1] - 2, col[2]))
             if col2 not in self.gl.cubes.cubes:
@@ -137,9 +149,17 @@ class Player:
         blockByVec = self.gl.cubes.hitTest(self.position, self.get_sight_vector())
 
         if button == 1 and blockByVec[0]:
+            if blockByVec[0] in self.gl.cubes.cubes:
+                if self.inventory.inventory[self.inventory.activeInventory][0] == \
+                        self.gl.cubes.cubes[blockByVec[0]].name:
+                    self.inventory.inventory[self.inventory.activeInventory][1] += 1
+                elif self.inventory.inventory[self.inventory.activeInventory][1] == 0:
+                    self.inventory.inventory[self.inventory.activeInventory][1] += 1
+                    self.inventory.inventory[self.inventory.activeInventory][0] = self.gl.cubes.cubes[blockByVec[0]].name
             self.gl.cubes.remove(blockByVec[0])
         if button == 2 and blockByVec[0]:
             self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
+            self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
         if button == 3:
             if blockByVec[0]:
                 if blockByVec[0] in self.gl.cubes.cubes:

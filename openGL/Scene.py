@@ -7,6 +7,7 @@ from OpenGL.GLUT import *
 from pyglet import shapes
 from pyglet.gl import *
 
+from blocks.Inventory import Inventory
 from game.worldGenerator import worldGenerator
 from openGL.CubeHandler import CubeHandler
 from settings import *
@@ -23,6 +24,7 @@ class Scene:
         self.gui = None
         self.player = None
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
+        self.fov = FOV
 
     def vertexList(self):
         x, y, w, h = WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT
@@ -52,6 +54,7 @@ class Scene:
 
         self.transparent = pyglet.graphics.Batch()
         self.opaque = pyglet.graphics.Batch()
+        self.player.inventory = Inventory(self)
         self.cubes = CubeHandler(self.opaque, self.block, self.opaque,
                                  ('leaves_taiga', 'leaves_oak', 'tall_grass', 'nocolor'), self)
 
@@ -64,7 +67,7 @@ class Scene:
 
     def set3d(self):
         glLoadIdentity()
-        gluPerspective(FOV, (WIDTH / HEIGHT), 0.1, RENDER_DISTANCE * 10)
+        gluPerspective(self.fov, (WIDTH / HEIGHT), 0.1, RENDER_DISTANCE * 10)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 

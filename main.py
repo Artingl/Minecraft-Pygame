@@ -9,8 +9,6 @@ from OpenGL.GL import *
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
 pygame.display.set_caption("Minecraft 1.0.0")
 
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
 gui = Gui()
 chunks = Chunks()
 scene = Scene()
@@ -30,6 +28,7 @@ gui.GUI_TEXTURES = {
         "sel_inventory": pyglet.resource.image("gui/sel_inventory.png"),
 }
 
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 texture = gui.GUI_TEXTURES["inventory"]
 texture.width *= 2
 texture.height *= 2
@@ -47,7 +46,6 @@ infoLabel = pyglet.text.Label("",
                               font_size=15,
                               x=0, y=WIDTH // 2 + 62)
 infoLabel.set_style("background_color", (104, 104, 104, 160))
-
 
 while True:
     for event in pygame.event.get():
@@ -67,8 +65,10 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:
                 player.inventory.activeInventory -= 1
+                gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
             elif event.button == 5:
                 player.inventory.activeInventory += 1
+                gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
     pygame.mouse.set_visible(PAUSE)
     if PAUSE:
         continue
@@ -80,8 +80,8 @@ while True:
     gui.update()
 
     if showInfoLabel:
-        infoLabel.text = f"FPS: {round(clock.get_fps())}\n" \
-                         f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}\n" \
+        infoLabel.text = f"FPS: {round(clock.get_fps())}   " \
+                         f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}   " \
                          f"World seed: {scene.worldGen.seed}"
         infoLabel.draw()
     pygame.display.flip()
