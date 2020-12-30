@@ -9,7 +9,7 @@ pygame.init()
 monitor = pygame.display.Info()
 WIDTH = monitor.current_w
 HEIGHT = monitor.current_h
-MAX_FPS = 250
+MAX_FPS = 100
 PAUSE = False
 clock = pygame.time.Clock()
 

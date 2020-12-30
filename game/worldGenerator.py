@@ -8,7 +8,7 @@ class worldGenerator:
     def __init__(self, glClass, seed=43242):
         self.seed = seed
         self.chunks = {}
-        self.worldPerlin = PerlinNoise(seed, mh=8)
+        self.worldPerlin = PerlinNoise(seed, mh=6)
         self.parent = glClass
 
     def add(self, p, t):
@@ -24,11 +24,13 @@ class worldGenerator:
                 y = self.worldPerlin(x, z) + sy
                 if random.randint(0, 120) == 20 and y > sy - 5:
                     self.spawnTree(x, y, z)
-                if y < sy - 5:
+                if y < sy - 15:
                     self.add((x, y, z), "sand")
                     sand = True
                 else:
                     self.add((x, y, z), "grass")
+                    if self.parent.startPlayerPos == [0, -90, 0]:
+                        self.parent.startPlayerPos = [x, y + 2, z]
                 self.add((x, 0, z), "bedrock")
                 for i in range(1, y):
                     if i > y - random.randint(5, 10):

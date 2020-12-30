@@ -14,7 +14,7 @@ chunks = Chunks()
 scene = Scene()
 player = Player(gl=scene)
 
-player.position = [0, 64, 0]
+player.position = [0, -90, 0]
 
 chunks.start()
 scene.gui = gui
@@ -37,7 +37,7 @@ texture = gui.GUI_TEXTURES["sel_inventory"]
 texture.width *= 2
 texture.height *= 2
 
-gui.addGuiElement("crosshair", (WIDTH // 2 - 20, HEIGHT // 2 - 20))
+gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
 infoLabel = pyglet.text.Label("",
@@ -65,9 +65,13 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:
                 player.inventory.activeInventory -= 1
+                if player.inventory.activeInventory < 0:
+                    player.inventory.activeInventory = 8
                 gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
             elif event.button == 5:
                 player.inventory.activeInventory += 1
+                if player.inventory.activeInventory > 8:
+                    player.inventory.activeInventory = 0
                 gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
     pygame.mouse.set_visible(PAUSE)
     if PAUSE:
@@ -82,7 +86,8 @@ while True:
     if showInfoLabel:
         infoLabel.text = f"FPS: {round(clock.get_fps())}   " \
                          f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}   " \
-                         f"World seed: {scene.worldGen.seed}"
+                         f"World seed: {scene.worldGen.seed}   " \
+                         f"Count of particles: {len(scene.particles.particles)}"
         infoLabel.draw()
     pygame.display.flip()
     clock.tick(MAX_FPS)

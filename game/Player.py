@@ -6,6 +6,7 @@ from OpenGL.GL import *
 from blocks.Inventory import Inventory
 from blocks.blockInventory import *
 from functions import roundPos
+from openGL.Cube import Cube
 from settings import *
 
 
@@ -24,6 +25,8 @@ class Player:
         self.acceleration = 0
         self.lastShiftPos = self.position
         self.cameraType = 1
+
+        self.bInAir = False
 
         self.inventory = None
 
@@ -137,12 +140,22 @@ class Player:
             else:
                 self.gl.fov = FOV'''
         #
-        if self.shift != 0:
-            col2 = roundPos((col[0], col[1] - 2, col[2]))
-            if col2 not in self.gl.cubes.cubes:
-                self.position = (self.lastShiftPos[0], col[1], self.lastShiftPos[2])
-                return
-        self.lastShiftPos = self.position
+        if not self.bInAir:
+            for i in range(1, 6):
+                col2 = roundPos((col[0], col[1] - i, col[2]))
+                if col2 not in self.gl.cubes.cubes:
+                    self.bInAir = True
+                else:
+                    self.bInAir = False
+                    break
+
+        col2 = roundPos((col[0], col[1] - 2, col[2]))
+        if self.bInAir and col2 in self.gl.cubes.cubes:
+            self.bInAir = False
+            self.gl.particles.addParticle((col[0], col[1] - 1, col[2]),
+                                          self.gl.cubes.cubes[col2],
+                                          direction="no",
+                                          count=10)
         self.position = col
 
     def mouseEvent(self, button):
@@ -155,28 +168,39 @@ class Player:
                     self.inventory.inventory[self.inventory.activeInventory][1] += 1
                 elif self.inventory.inventory[self.inventory.activeInventory][1] == 0:
                     self.inventory.inventory[self.inventory.activeInventory][1] += 1
-                    self.inventory.inventory[self.inventory.activeInventory][0] = self.gl.cubes.cubes[blockByVec[0]].name
+                    self.inventory.inventory[self.inventory.activeInventory][0] = \
+                        self.gl.cubes.cubes[blockByVec[0]].name
+            self.gl.particles.addParticle(self.gl.cubes.cubes[blockByVec[0]].p, self.gl.cubes.cubes[blockByVec[0]],
+                                          direction="down")
             self.gl.cubes.remove(blockByVec[0])
         if button == 2 and blockByVec[0]:
             self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
             self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
         if button == 3:
-            if blockByVec[0]:
+            if blockByVec[0] and self.shift == 0:
                 if blockByVec[0] in self.gl.cubes.cubes:
-                    if canOpenBlock(self.gl.cubes.cubes[blockByVec[0]]):
-                        openBlockInventory(self, self.gl.cubes.cubes[blockByVec[0]])
+                    if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[0]], self.gl):
+                        openBlockInventory(self, self.gl.cubes.cubes[blockByVec[0]], self.gl)
+                        return
+            if blockByVec[1] and self.shift == 0:
+                if blockByVec[1] in self.gl.cubes.cubes:
+                    if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[1]], self.gl):
+                        openBlockInventory(self, self.gl.cubes.cubes[blockByVec[1]], self.gl)
                         return
             if blockByVec[1]:
+                playerPos = tuple(roundPos((self.position[0], self.position[1] - 1, self.position[2])))
+                playerPos2 = tuple(roundPos((self.position[0], self.position[1], self.position[2])))
                 blockByVec = blockByVec[1][0], blockByVec[1][1], blockByVec[1][2]
                 if self.inventory.inventory[self.inventory.activeInventory][0] and \
-                        self.inventory.inventory[self.inventory.activeInventory][1]:
+                        self.inventory.inventory[self.inventory.activeInventory][1] and blockByVec != playerPos and \
+                        blockByVec != playerPos2:
                     self.gl.cubes.add(blockByVec, self.inventory.inventory[self.inventory.activeInventory][0], now=True)
                     self.inventory.inventory[self.inventory.activeInventory][1] -= 1
 
     def collide(self, pos):
         if pos[1] < -80:
             self.dy = 0
-            return 0, 60, 0
+            return self.gl.startPlayerPos
 
         p = list(pos)
         np = roundPos(pos)

@@ -8,6 +8,7 @@ from pyglet import shapes
 from pyglet.gl import *
 
 from blocks.Inventory import Inventory
+from game.Particles import Particles
 from game.worldGenerator import worldGenerator
 from openGL.CubeHandler import CubeHandler
 from settings import *
@@ -21,10 +22,22 @@ class Scene:
         self.drawCounter = 0
         self.in_water = False
         self.worldGen = worldGenerator(self, randint(434, 434343454))
+        self.particles = Particles(self)
         self.gui = None
         self.player = None
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV
+
+        self.time = 200
+
+        self.skyColor = [128, 179, 255]
+
+        self.mskyColor = [128, 179, 255]
+        self.nskyColor = [4, 6, 10]
+
+        self.lightingColor = [200, 200, 200]
+
+        self.startPlayerPos = [0, -90, 0]
 
     def vertexList(self):
         x, y, w, h = WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT
@@ -54,6 +67,7 @@ class Scene:
 
         self.transparent = pyglet.graphics.Batch()
         self.opaque = pyglet.graphics.Batch()
+        self.particleBatch = pyglet.graphics.Batch()
         self.player.inventory = Inventory(self)
         self.cubes = CubeHandler(self.opaque, self.block, self.opaque,
                                  ('leaves_taiga', 'leaves_oak', 'tall_grass', 'nocolor'), self)
@@ -72,6 +86,8 @@ class Scene:
         glLoadIdentity()
 
     def updateScene(self):
+        self.time += 9 * clock.tick() / 100
+
         self.drawCounter += 1
         if self.drawCounter > 1 and self.chunkg > 0:
             self.drawCounter = 0
@@ -89,13 +105,17 @@ class Scene:
 
         self.set3d()
 
-        glClearColor(0.5, 0.7, 1, 1)
+        glClearColor(self.skyColor[0] / 255, self.skyColor[1] / 255, self.skyColor[2] / 255, 1)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
+        # glColor3d(self.lightingColor[0] / 255, self.lightingColor[1] / 255, self.lightingColor[2] / 255)
+
         self.player.update()
         self.draw()
+
+        self.particles.drawParticles()
 
         blockByVec = self.cubes.hitTest(self.player.position, self.player.get_sight_vector())
         if blockByVec[0]:
@@ -121,3 +141,6 @@ class Scene:
         self.transparent.draw()
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
         self.transparent.draw()
+
+        self.particleBatch.draw()
+        self.particleBatch = pyglet.graphics.Batch()

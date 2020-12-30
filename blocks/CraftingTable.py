@@ -6,8 +6,8 @@ class CraftingTable:
         self.pc = plClass
         self.bc = blClass
 
-        self.pc.gl.gui.addGuiElement("crafting_table", (WIDTH // 2, HEIGHT // 2))
-        self.waitForExit()
+        # self.pc.gl.gui.addGuiElement("crafting_table", (WIDTH // 2, HEIGHT // 2))
+        # self.waitForExit()
 
     def waitForExit(self):
         key = pygame.key.get_pressed()
