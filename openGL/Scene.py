@@ -1,15 +1,11 @@
-import threading
-
-import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from pyglet import shapes
 from pyglet.gl import *
 
-from blocks.Inventory import Inventory
+from game.entity.Inventory import Inventory
 from game.Particles import Particles
-from game.worldGenerator import worldGenerator
+from game.world.worldGenerator import worldGenerator
 from openGL.CubeHandler import CubeHandler
 from settings import *
 from functions import *
@@ -17,6 +13,8 @@ from functions import *
 
 class Scene:
     def __init__(self):
+        print("Init Scene class...")
+
         self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
         self.chunkg = len(self.worldSp)
         self.drawCounter = 0
@@ -24,9 +22,12 @@ class Scene:
         self.worldGen = worldGenerator(self, randint(434, 434343454))
         self.particles = Particles(self)
         self.gui = None
+        self.sound = None
         self.player = None
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV
+
+        self.entity = []
 
         self.time = 200
 
@@ -45,6 +46,8 @@ class Scene:
                                                    ('c3f', (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 
     def initScene(self):
+        print("Init OpenGL scene...")
+
         glClearColor(0.5, 0.7, 1, 1)
         glClearDepth(1.0)
         glDepthFunc(GL_LESS)
@@ -115,6 +118,9 @@ class Scene:
         self.player.update()
         self.draw()
 
+        for i in self.entity:
+            i.update()
+
         self.particles.drawParticles()
 
         blockByVec = self.cubes.hitTest(self.player.position, self.player.get_sight_vector())
@@ -127,11 +133,6 @@ class Scene:
 
         glPopMatrix()
         self.set2d()
-
-        glBegin(GL_LINES)
-        glVertex2f(-10, 0)
-        glVertex2f(10, 1)
-        glEnd()
 
     def draw(self):
         glEnable(GL_ALPHA_TEST)

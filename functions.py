@@ -7,6 +7,7 @@ from OpenGL.raw.GL.VERSION.GL_1_0 import glTexParameteri, GL_TEXTURE_2D, GL_TEXT
 
 
 def load_textures(self):
+    print("Loading textures...")
     t = self.texture
     dirs = ['textures']
     while dirs:
@@ -25,6 +26,8 @@ def load_textures(self):
                 texture = image.get_mipmapped_texture()
                 self.texture[n] = pyglet.graphics.TextureGroup(texture)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+                print("Successful loaded", n, "texture!")
     done = []
     items = sorted(self.texture_dir.items(), key=lambda i: i[0])
     for n1, d in items:

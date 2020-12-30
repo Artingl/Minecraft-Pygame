@@ -20,7 +20,7 @@ class Particles:
         for i in range(count):
 
             dx, dy, dz = choice(numbers), choice(numbers), choice(numbers)
-            self.particles.append([list(p), cubeClass, 0.2, [dx, dy, dz], .0001, direction])
+            self.particles.append([list(p), cubeClass, 0.2, [dx, dy, dz], .001, direction])
 
     def drawParticles(self):
         if not self.particles:
@@ -31,8 +31,6 @@ class Particles:
                 self.particles.pop(e)
                 continue
 
-            i[3][1] += i[4]
-
             if i[5] != "no":
 
                 i[0][0] += i[3][0] / 50
@@ -40,19 +38,21 @@ class Particles:
                 i[0][2] += i[3][2] / 50
 
                 if i[5] == "down":
-                    i[0][0] -= i[4]
-                    i[0][1] -= i[4]
-                    i[0][2] -= i[4]
+                    i[3][0] += i[4] / 10
+                    i[3][1] += i[4]
+                    i[3][2] += i[4] / 10
                 elif i[5] == "up":
-                    i[0][0] += i[4]
-                    i[0][1] += i[4]
-                    i[0][2] += i[4]
+                    i[3][0] += i[4] / 10
+                    i[3][1] += i[4]
+                    i[3][2] += i[4] / 10
                 elif i[5] == "left":
-                    i[0][0] += i[4]
-                    i[0][2] += i[4]
+                    i[3][0] += i[4] / 10
+                    i[3][1] += i[4] / 10
+                    i[3][2] += i[4]
                 elif i[5] == "right":
-                    i[0][0] -= i[4]
-                    i[0][2] -= i[4]
+                    i[3][0] += i[4]
+                    i[3][1] += i[4] / 10
+                    i[3][2] += i[4] / 10
             else:
                 i[0][0] += i[3][0] / 50
                 i[0][2] += i[3][2] / 50

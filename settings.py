@@ -2,7 +2,7 @@ import pygame
 from pyglet import font
 
 font.add_file('gui/main.ttf')
-mainFont = font.load('gui/main.ttf', 16)
+mainFont = font.load('gui/main.ttf', 15)
 
 pygame.init()
 

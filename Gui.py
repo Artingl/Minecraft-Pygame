@@ -4,6 +4,8 @@ from settings import *
 
 class Gui:
     def __init__(self):
+        print("Init GUI class...")
+
         self.GUI_TEXTURES = {}
         self.shows = {}
 
@@ -11,8 +13,8 @@ class Gui:
         self.label = pyglet.text.Label("",
                                        font_name='Minecraft Rus',
                                        color=(255, 255, 255, 255),
-                                       font_size=15,
-                                       x=WIDTH // 2, y=60, anchor_x='center')
+                                       font_size=17,
+                                       x=WIDTH // 2, y=90, anchor_x='center')
 
     def showText(self, text):
         self.label.text = text
