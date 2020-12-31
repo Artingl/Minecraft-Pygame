@@ -16,10 +16,10 @@ class Inventory:
         self.heartAnimation = []
 
         ls = list(self.gl.inventory_textures.items())
-        old = '-'
+        old = False
         for i in range(10):
-            old = '-' if randint(0, 1) == 1 and old != '-' else '+'
-            self.heartAnimation.append([0, old])
+            old = not old
+            self.heartAnimation.append([0, '-' if old else '+'])
         for i in range(9):
             block = ls[i][0]
             if i == 0:

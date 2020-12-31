@@ -1,7 +1,7 @@
 import os
-import time
 
-from Sound import Sound
+from game.sound.BlockSound import BlockSound
+from game.sound.Sound import Sound
 from Gui import Gui
 import pyglet
 from game.entity.Player import Player
@@ -31,10 +31,12 @@ pygame.display.set_caption("Minecraft 1.0.0")
 gui = Gui()
 sound = Sound()
 scene = Scene()
+blockSound = BlockSound(scene)
 player = Player(gl=scene)
 
 player.position = [0, -90, 0]
 
+scene.blockSound = blockSound
 scene.gui = gui
 scene.sound = sound
 scene.player = player
@@ -55,7 +57,19 @@ pygame.display.flip()
 print("Loading sounds...")
 sound.SOUNDS = {
     "oof": pygame.mixer.Sound("sounds/oof.mp3"),
+    "boom": pygame.mixer.Sound("sounds/boom.mp3"),
 }
+
+sound.BLOCKS_SOUND["dig"] = {}
+for e, i in enumerate(os.listdir("sounds/dig/")):
+    soundName = i.split(".")[0][:-1]
+    soundNum = i.split(".")[0][-1]
+
+    if soundName not in sound.BLOCKS_SOUND["dig"]:
+        sound.BLOCKS_SOUND["dig"][soundName] = []
+
+    sound.BLOCKS_SOUND["dig"][soundName].append(pygame.mixer.Sound("sounds/dig/" + i))
+    print("Successful loaded", soundName, "#" + soundNum, "sound!")
 
 print("Loading music...")
 for e, i in enumerate(os.listdir("sounds/music/")):

@@ -6,6 +6,7 @@ import pygame
 class Sound:
     def __init__(self):
         print("Init Sound class...")
+        self.BLOCKS_SOUND = {}
         self.SOUNDS = {}
         self.MUSIC = []
         self.music_already_playing = False

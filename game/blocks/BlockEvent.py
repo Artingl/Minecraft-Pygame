@@ -7,6 +7,7 @@ def openBlockInventory(playerClass, blockClass, gl):
         craftingtable = CraftingTable(playerClass, blockClass)
 
     if blockClass.name == "tnt":
+        gl.blockSound.playBoomSound()
         exp = Explosion(gl, blockClass.p, 5, blockClass)
         exp.run()
 

@@ -23,6 +23,7 @@ class Scene:
         self.particles = Particles(self)
         self.gui = None
         self.sound = None
+        self.blockSound = None
         self.player = None
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV

@@ -2,7 +2,7 @@ import math
 
 from OpenGL.GL import *
 
-from game.blocks.blockInventory import *
+from game.blocks.BlockEvent import *
 from functions import roundPos
 from settings import *
 
@@ -192,6 +192,7 @@ class Player:
                     self.inventory.inventory[self.inventory.activeInventory][1] += 1
                     self.inventory.inventory[self.inventory.activeInventory][0] = \
                         self.gl.cubes.cubes[blockByVec[0]].name
+            self.gl.blockSound.playBlockSound(self.gl.cubes.cubes[blockByVec[0]].name)
             self.gl.particles.addParticle(self.gl.cubes.cubes[blockByVec[0]].p, self.gl.cubes.cubes[blockByVec[0]],
                                           direction="down")
             self.gl.cubes.remove(blockByVec[0])
