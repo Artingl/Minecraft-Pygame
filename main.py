@@ -45,8 +45,9 @@ sound.SOUNDS = {
 
 print("Loading music...")
 for e, i in enumerate(os.listdir("sounds/music/")):
-    sound.MUSIC.append(pygame.mixer.Sound("sounds/music/" + i))
-    print("Successful loaded", i, "music!")
+    sound.MUSIC.append("sounds/music/" + i)
+sound.initMusic()
+print("Music loaded successful!")
 
 print("Loading GUI textures...")
 gui.GUI_TEXTURES = {
