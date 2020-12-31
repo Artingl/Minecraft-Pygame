@@ -16,6 +16,7 @@ class Sound:
     def playMusic(self):
         if self.music_already_playing:
             return
-        self.music_already_playing = True
-        self.channel = self.MUSIC[randint(0, len(self.MUSIC) - 1)].play()
-        self.channel.set_volume(0.1)
+        if randint(0, 5000) == 746:
+            self.music_already_playing = True
+            self.channel = self.MUSIC[randint(0, len(self.MUSIC) - 1)].play()
+            self.channel.set_volume(0.1)

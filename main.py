@@ -34,7 +34,7 @@ glLoadIdentity()
 
 scene.set2d()
 logo = pyglet.resource.image("gui/logo.png")
-logo.blit(WIDTH // 2 - 128, HEIGHT // 2 - 128)
+logo.blit(WIDTH // 2 - (logo.width // 2), HEIGHT // 2 - (logo.height // 2))
 pygame.display.flip()
 #
 
