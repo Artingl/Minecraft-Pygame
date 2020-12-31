@@ -19,7 +19,7 @@ class Particles:
 
         for i in range(count):
             dx, dy, dz = choice(numbers), choice(numbers), choice(numbers)
-            self.particles.append([list(p), cubeClass, 0.2, [dx, dy, dz], .001, direction])
+            self.particles.append([list(p), cubeClass, randint(1, 4) / 10, [dx, dy, dz], .001, direction, 0.02])
 
     def drawParticles(self):
         if not self.particles:
@@ -31,27 +31,34 @@ class Particles:
                 continue
 
             if i[5] != "no":
-
-                i[0][0] += i[3][0] / 50
-                i[0][1] += i[3][1] / 50
-                i[0][2] += i[3][2] / 50
-
                 if i[5] == "down":
-                    i[3][0] += i[4] / 10
-                    i[3][1] += i[4]
-                    i[3][2] += i[4] / 10
+                    if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
+                        i[0][0] += i[3][0] / 100
+                        i[0][1] += i[6]
+                        i[0][2] += i[3][2] / 100
+
+                        i[6] -= 0.005
                 elif i[5] == "up":
-                    i[3][0] += i[4] / 10
-                    i[3][1] += i[4]
-                    i[3][2] += i[4] / 10
+                    if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
+                        i[0][0] += i[3][0] / 100
+                        i[0][1] += i[6]
+                        i[0][2] += i[3][2] / 100
+
+                        i[6] += 0.005
                 elif i[5] == "left":
-                    i[3][0] += i[4] / 10
-                    i[3][1] += i[4] / 10
-                    i[3][2] += i[4]
+                    if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
+                        i[0][0] += i[6]
+                        i[0][1] += i[3][1] / 100
+                        i[0][2] += i[6]
+
+                        i[6] -= 0.005
                 elif i[5] == "right":
-                    i[3][0] += i[4]
-                    i[3][1] += i[4] / 10
-                    i[3][2] += i[4] / 10
+                    if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
+                        i[0][0] += i[6]
+                        i[0][1] += i[3][1] / 100
+                        i[0][2] += i[6]
+
+                        i[6] += 0.005
             else:
                 i[0][0] += i[3][0] / 50
                 i[0][2] += i[3][2] / 50
@@ -64,7 +71,6 @@ class Particles:
             X, Y, Z = x + i[2], y + i[2], z + i[2]
 
             tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
-
             self.gl.particleBatch.add(4, GL_QUADS, i[1].t[4], ('v3f', (X, y, z, x, y, z, x, Y, z, X, Y, z)),
                                       tex_coords)  # back
             self.gl.particleBatch.add(4, GL_QUADS, i[1].t[5], ('v3f', (x, y, Z, X, y, Z, X, Y, Z, x, Y, Z)),
@@ -80,5 +86,5 @@ class Particles:
             self.gl.particleBatch.add(4, GL_QUADS, i[1].t[3], ('v3f', (x, Y, Z, X, Y, Z, X, Y, z, x, Y, z)),
                                       tex_coords)  # top
 
-            i[2] -= 0.01
+            i[2] -= 0.009
             self.particles[e] = i
