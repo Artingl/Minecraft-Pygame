@@ -9,6 +9,20 @@ from openGL.Scene import Scene
 from settings import *
 from OpenGL.GL import *
 
+
+def drawInfoLabel(text):
+    y = 0
+    for i in text.split("\n"):
+        lbl = pyglet.text.Label(i,
+                                font_name='Minecraft Rus',
+                                color=(255, 255, 255, 255),
+                                font_size=15,
+                                x=0, y=WIDTH // 2 + y)
+        lbl.set_style("background_color", (104, 104, 104, 160))
+        lbl.draw()
+        y -= 21
+
+
 print("Loading the game...")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
@@ -51,13 +65,13 @@ print("Music loaded successful!")
 
 print("Loading GUI textures...")
 gui.GUI_TEXTURES = {
-        "crafting_table": pyglet.resource.image("gui/crafting_table.png"),
-        "crosshair": pyglet.resource.image("gui/crosshair.png"),
-        "inventory": pyglet.resource.image("gui/inventory.png"),
-        "sel_inventory": pyglet.resource.image("gui/sel_inventory.png"),
-        "fullheart": pyglet.resource.image("gui/fullheart.png"),
-        "halfheart": pyglet.resource.image("gui/halfheart.png"),
-        "heartbg": pyglet.resource.image("gui/heartbg.png"),
+    "crafting_table": pyglet.resource.image("gui/crafting_table.png"),
+    "crosshair": pyglet.resource.image("gui/crosshair.png"),
+    "inventory": pyglet.resource.image("gui/inventory.png"),
+    "sel_inventory": pyglet.resource.image("gui/sel_inventory.png"),
+    "fullheart": pyglet.resource.image("gui/fullheart.png"),
+    "halfheart": pyglet.resource.image("gui/halfheart.png"),
+    "heartbg": pyglet.resource.image("gui/heartbg.png"),
 }
 
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -84,12 +98,6 @@ texture.height *= 2
 gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
-infoLabel = pyglet.text.Label("",
-                              font_name='Minecraft Rus',
-                              color=(255, 255, 255, 255),
-                              font_size=15,
-                              x=0, y=WIDTH // 2 + 62)
-infoLabel.set_style("background_color", (104, 104, 104, 160))
 print("Loading complete!")
 
 while True:
@@ -130,11 +138,10 @@ while True:
     gui.update()
 
     if showInfoLabel:
-        infoLabel.text = f"FPS: {round(clock.get_fps())}   " \
-                         f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}   " \
-                         f"World seed: {scene.worldGen.seed}   " \
-                         f"Count of particles: {len(scene.particles.particles)}   " \
-                         f"Chunks: {scene.chunkg}"
-        infoLabel.draw()
+        drawInfoLabel(f"FPS: {round(clock.get_fps())}\n"
+                      f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}\n"
+                      f"World seed: {scene.worldGen.seed}\n"
+                      f"Count of particles: {len(scene.particles.particles)}\n"
+                      f"Chunks: {scene.chunkg}")
     pygame.display.flip()
     clock.tick(MAX_FPS)
