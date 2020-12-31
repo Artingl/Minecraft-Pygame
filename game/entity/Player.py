@@ -32,7 +32,7 @@ class Player:
         self.playerFallY = 0
 
     def setCameraShake(self):
-        if not self.canShake or self.shift != 0:
+        if not self.canShake or self.shift > 0:
             return
 
         if not self.cameraShake[1]:
@@ -43,6 +43,14 @@ class Player:
             self.cameraShake[0] += 0.007
             if self.cameraShake[0] > 0.1:
                 self.cameraShake[1] = False
+
+    def setShift(self, b):
+        if b:
+            if self.shift < 0.3:
+                self.shift += 0.05
+        else:
+            if self.shift > 0:
+                self.shift -= 0.05
 
     def updatePosition(self):
         rdx, rdy = pygame.mouse.get_pos()
@@ -89,12 +97,13 @@ class Player:
         if key[pygame.K_SPACE]:
             self.jump()
         if key[pygame.K_LSHIFT]:
-            self.shift = 0.3
+            self.setShift(True)
             self.acceleration = -0.01
         else:
-            self.shift = 0
+            self.setShift(False)
             if self.acceleration == -0.01:
                 self.acceleration = 0
+
         dt = self.speed
 
         self.position = [self.position[0] + DX, self.position[1] + DY, self.position[2] + DZ]
@@ -218,6 +227,7 @@ class Player:
                         self.inventory.inventory[self.inventory.activeInventory][1] and blockByVec != playerPos and \
                         blockByVec != playerPos2:
                     self.gl.cubes.add(blockByVec, self.inventory.inventory[self.inventory.activeInventory][0], now=True)
+                    self.gl.blockSound.playBlockSound(self.gl.cubes.cubes[blockByVec].name)
                     self.inventory.inventory[self.inventory.activeInventory][1] -= 1
 
     def collide(self, pos):

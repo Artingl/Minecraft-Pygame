@@ -6,7 +6,8 @@ class BlockSound:
         self.gl = gl
 
     def playBoomSound(self):
-        self.gl.sound.SOUNDS["boom"].play()
+        chnl = self.gl.sound.SOUNDS["boom"].play()
+        chnl.set_volume(0.3)
 
     def playBlockSound(self, blockName):
         blName = "stone"
