@@ -137,7 +137,11 @@ class Player:
 
         x, y, z = self.position
         col = self.collide((x + dx, y + dy, z + dz))
+        col2 = roundPos((col[0], col[1] - 2, col[2]))
         self.canShake = self.position[1] == col[1]
+        if self.position[0] != col[0] or self.position[2] != col[2]:
+            if col2 in self.gl.cubes.cubes:
+                self.gl.blockSound.playStepSound(self.gl.cubes.cubes[col2].name)
         # Dynamic FOV
         '''if self.position[0] != col[0] or self.position[2] != col[2]:
             if self.gl.fov < FOV + 20:
@@ -163,21 +167,23 @@ class Player:
         else:
             self.lastPlayerPosOnGround = col
 
-        col2 = roundPos((col[0], col[1] - 2, col[2]))
         if self.bInAir and col2 in self.gl.cubes.cubes:
+            hp = self.hp
             if 3 < self.playerFallY:
-                self.gl.sound.playSound("oof", 0.8)
-                self.hp -= 1
+                # self.gl.sound.playSound("oof", 0.8)
+                hp -= 1
                 if self.playerFallY < 6:
-                    self.hp -= 3
+                    hp -= 3
                 elif self.playerFallY < 10:
-                    self.hp -= 5
+                    hp -= 5
                 elif self.playerFallY < 17:
-                    self.hp -= 8
+                    hp -= 8
                 elif self.playerFallY < 25:
-                    self.hp -= 11
+                    hp -= 11
                 else:
-                    self.hp = 0
+                    hp = 0
+                self.gl.blockSound.damageByBlock(self.gl.cubes.cubes[col2].name, hp)
+            self.hp = hp
             if self.hp <= 0:
                 # Player dead
                 self.hp = 20
@@ -185,7 +191,7 @@ class Player:
             self.bInAir = False
             self.gl.particles.addParticle((col[0], col[1] - 1, col[2]),
                                           self.gl.cubes.cubes[col2],
-                                          direction="no",
+                                          direction="down",
                                           count=10)
         self.position = col
 

@@ -55,11 +55,20 @@ pygame.display.flip()
 #
 
 print("Loading sounds...")
-sound.SOUNDS = {
-    "oof": pygame.mixer.Sound("sounds/oof.mp3"),
-    "boom": pygame.mixer.Sound("sounds/boom.mp3"),
-}
 
+print("Loading step sounds...")
+sound.BLOCKS_SOUND["step"] = {}
+for e, i in enumerate(os.listdir("sounds/step/")):
+    soundName = i.split(".")[0][:-1]
+    soundNum = i.split(".")[0][-1]
+
+    if soundName not in sound.BLOCKS_SOUND["step"]:
+        sound.BLOCKS_SOUND["step"][soundName] = []
+
+    sound.BLOCKS_SOUND["step"][soundName].append(pygame.mixer.Sound("sounds/step/" + i))
+    print("Successful loaded", soundName, "#" + soundNum, "sound!")
+
+print("Loading dig sounds...")
 sound.BLOCKS_SOUND["dig"] = {}
 for e, i in enumerate(os.listdir("sounds/dig/")):
     soundName = i.split(".")[0][:-1]
@@ -69,6 +78,27 @@ for e, i in enumerate(os.listdir("sounds/dig/")):
         sound.BLOCKS_SOUND["dig"][soundName] = []
 
     sound.BLOCKS_SOUND["dig"][soundName].append(pygame.mixer.Sound("sounds/dig/" + i))
+    print("Successful loaded", soundName, "#" + soundNum, "sound!")
+
+print("Loading explode sounds...")
+sound.BLOCKS_SOUND["explode"] = []
+for e, i in enumerate(os.listdir("sounds/explode/")):
+    soundName = i.split(".")[0][:-1]
+    soundNum = i.split(".")[0][-1]
+
+    sound.BLOCKS_SOUND["explode"].append(pygame.mixer.Sound("sounds/explode/" + i))
+    print("Successful loaded", soundName, "#" + soundNum, "sound!")
+
+print("Loading damage sounds...")
+sound.SOUNDS["damage"] = {}
+for e, i in enumerate(os.listdir("sounds/damage/")):
+    soundName = i.split(".")[0][:-1]
+    soundNum = i.split(".")[0][-1]
+
+    if soundName not in sound.SOUNDS["damage"]:
+        sound.SOUNDS["damage"][soundName] = []
+
+    sound.SOUNDS["damage"][soundName].append(pygame.mixer.Sound("sounds/damage/" + i))
     print("Successful loaded", soundName, "#" + soundNum, "sound!")
 
 print("Loading music...")

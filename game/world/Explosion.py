@@ -6,7 +6,7 @@ class Explosion:
         self.gl, self.pos, self.fr, self.bc = gl, list(pos), fr, bc
 
     def run(self):
-        self.gl.particles.addParticle(self.pos, self.bc, numbers=range(-15, 15), direction="up", count=100)
+        self.gl.particles.addParticle(self.pos, self.bc, numbers=range(-15, 15), direction="down", count=100)
         self.gl.cubes.remove(tuple(self.pos))
 
         for x in range(-(self.fr // 2) + randint(-1, 1), self.fr // 2 + randint(-1, 1)):
