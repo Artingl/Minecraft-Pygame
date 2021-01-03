@@ -140,7 +140,7 @@ class Player:
         col2 = roundPos((col[0], col[1] - 2, col[2]))
         self.canShake = self.position[1] == col[1]
         if self.position[0] != col[0] or self.position[2] != col[2]:
-            if col2 in self.gl.cubes.cubes:
+            if col2 in self.gl.cubes.cubes and self.shift <= 0:
                 self.gl.blockSound.playStepSound(self.gl.cubes.cubes[col2].name)
         # Dynamic FOV
         # if self.position[0] != col[0] or self.position[2] != col[2]:
@@ -215,12 +215,12 @@ class Player:
             self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
             self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
         if button == 3:
-            if blockByVec[0] and self.shift == 0:
+            if blockByVec[0] and self.shift <= 0:
                 if blockByVec[0] in self.gl.cubes.cubes:
                     if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[0]], self.gl):
                         openBlockInventory(self, self.gl.cubes.cubes[blockByVec[0]], self.gl)
                         return
-            if blockByVec[1] and self.shift == 0:
+            if blockByVec[1] and self.shift <= 0:
                 if blockByVec[1] in self.gl.cubes.cubes:
                     if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[1]], self.gl):
                         openBlockInventory(self, self.gl.cubes.cubes[blockByVec[1]], self.gl)

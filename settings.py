@@ -10,8 +10,8 @@ monitor = pygame.display.Info()
 WIDTH = monitor.current_w
 HEIGHT = monitor.current_h
 MAX_FPS = 100
-PAUSE = False
-IN_MENU = False
+PAUSE = True
+IN_MENU = True
 clock = pygame.time.Clock()
 
 FOV = 100

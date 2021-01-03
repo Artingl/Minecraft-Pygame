@@ -10,7 +10,9 @@ from settings import *
 from OpenGL.GL import *
 
 
-def drawInfoLabel(text, xx=0, yy=0, style=[]):
+def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline'):
+    if style is None:
+        style = []
     y = -21
     for i in text.split("\n"):
         ix = 2
@@ -21,26 +23,37 @@ def drawInfoLabel(text, xx=0, yy=0, style=[]):
             iy = yy - 2
         shadow_lbl = pyglet.text.Label(i,
                                        font_name='Minecraft Rus',
-                                       color=(100, 100, 100, 255),
-                                       font_size=15,
-                                       x=ix, y=iy)
+                                       color=(63, 63, 63, 255),
+                                       font_size=size,
+                                       x=ix, y=iy,
+                                       anchor_x=anchor_x,
+                                       anchor_y=anchor_y)
         lbl = pyglet.text.Label(i,
                                 font_name='Minecraft Rus',
                                 color=(255, 255, 255, 255),
-                                font_size=15,
-                                x=ix - 2, y=iy + 2)
+                                font_size=size,
+                                x=ix - 2, y=iy + 2,
+                                anchor_x=anchor_x,
+                                anchor_y=anchor_y)
         if not style:
             lbl.set_style("background_color", (104, 104, 104, 160))
         else:
             for st in style:
                 lbl.set_style(st[0], st[1])
+                shadow_lbl.set_style(st[0], st[1])
         shadow_lbl.draw()
         lbl.draw()
         y -= 21
 
 
-def drawMainMenu():
-    global mainMenuRotation
+def checkHover(ox, oy, ow, oh, mx, my):
+    if ox < mx < ox + ow and oy < my < oy + oh:
+        return True
+    return False
+
+
+def drawMainMenu(mc):
+    global mainMenuRotation, IN_MENU, PAUSE
     glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.7, 1, 1))
     glFogf(GL_FOG_START, 60)
     glFogf(GL_FOG_END, 120)
@@ -59,13 +72,25 @@ def drawMainMenu():
 
     glPopMatrix()
     scene.set2d()
+    mp = pygame.mouse.get_pos()
+
+    drawInfoLabel("Minecraft 1.5.2", xx=10, yy=10, style=[('', '')], size=12)
 
     tex = gui.GUI_TEXTURES["game_logo"]
     tex.blit(WIDTH // 2 - (tex.width // 2), HEIGHT - tex.height - (HEIGHT // 15))
 
     but_tex = gui.GUI_TEXTURES["button_bg"]
-    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2)
-    drawInfoLabel("Singleplayer", xx=WIDTH // 2, yy=HEIGHT // 2, style=[('anchor_x', 'center')])
+    if checkHover(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2),
+                  but_tex.width, but_tex.height,
+                  mp[0], mp[1]):
+        but_tex = gui.GUI_TEXTURES["button_bg_hover"]
+        if mc == 1:
+            IN_MENU = False
+            PAUSE = False
+
+    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2))
+    drawInfoLabel("Singleplayer", xx=WIDTH // 2, yy=HEIGHT // 2 - (but_tex.height // 2) + 14, style=[('', '')],
+                  size=12, anchor_x='center')
 
     pygame.display.flip()
     clock.tick(MAX_FPS)
@@ -77,7 +102,7 @@ def drawMainMenu():
 print("Loading the game...")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
-pygame.display.set_caption("Minecraft 1.0.0")
+pygame.display.set_caption("Minecraft 1.5.2")
 
 gui = Gui()
 sound = Sound()
@@ -217,9 +242,12 @@ print("Loading complete!")
 mainMenuRotation = [0, 180]
 
 while True:
+    mbclicked = None
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mbclicked = event.button
         if not IN_MENU:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -246,7 +274,7 @@ while True:
     pygame.mouse.set_visible(PAUSE)
 
     if IN_MENU:
-        drawMainMenu()
+        drawMainMenu(mbclicked)
 
     if PAUSE:
         continue
