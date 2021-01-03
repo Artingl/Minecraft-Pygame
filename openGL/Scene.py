@@ -35,9 +35,19 @@ class Scene:
         self.skyColor = [128, 179, 255]
         self.mskyColor = [128, 179, 255]
         self.nskyColor = [4, 6, 10]
-        self.lightingColor = [200, 200, 200]
+        self.lightingColor = 200
         self.startPlayerPos = [0, -90, 0]
         self.entity = []
+        self.panorama = {}
+
+    def loadPanoramaTextures(self):
+        print("Loading panorama textures...")
+        for e, i in enumerate(os.listdir("gui/bg/")):
+            self.panorama[e] = \
+                pyglet.graphics.TextureGroup(pyglet.image.load("gui/bg/" + i).get_mipmapped_texture())
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
     def vertexList(self):
         x, y, w, h = WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT
@@ -53,7 +63,6 @@ class Scene:
         glDepthFunc(GL_LESS)
         glShadeModel(GL_SMOOTH)
         glMatrixMode(GL_PROJECTION)
-        glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
         glAlphaFunc(GL_GEQUAL, 1)
         glEnable(GL_BLEND)
@@ -65,6 +74,7 @@ class Scene:
 
         glLoadIdentity()
         load_textures(self)
+        self.loadPanoramaTextures()
         self.vertexList()
 
         self.obj.loadModels()
@@ -88,17 +98,51 @@ class Scene:
 
     def set3d(self):
         glLoadIdentity()
-        gluPerspective(self.fov, (WIDTH / HEIGHT), 0.1, RENDER_DISTANCE * 10)
+        gluPerspective(self.fov, (WIDTH / HEIGHT), 0.1, RENDER_DISTANCE)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
+    def drawPanorama(self):
+        pp = self.player.position
+        sx, sy, sz = 60, 60, 60
+
+        x, y, z = pp[0] - (sx // 2), -(sy // 2), pp[2] - (sz // 2)
+        X, Y, Z = x + sx, y + sy, z + sz
+
+        vertexes = [
+            (X, y, z, x, y, z, x, Y, z, X, Y, z),
+            (x, y, Z, X, y, Z, X, Y, Z, x, Y, Z),
+            (x, y, z, x, y, Z, x, Y, Z, x, Y, z),
+            (X, y, Z, X, y, z, X, Y, z, X, Y, Z),
+            (x, y, z, X, y, z, X, y, Z, x, y, Z),
+            (x, Y, Z, X, Y, Z, X, Y, z, x, Y, z),
+        ]
+
+        tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
+        mode = GL_QUADS
+        self.particleBatch.add(4, mode, self.panorama[2], ('v3f', vertexes[0]),
+                               tex_coords)  # back
+        self.particleBatch.add(4, mode, self.panorama[0], ('v3f', vertexes[1]),
+                               tex_coords)  # front
+
+        self.particleBatch.add(4, mode, self.panorama[3], ('v3f', vertexes[2]),
+                               tex_coords)  # left
+        self.particleBatch.add(4, mode, self.panorama[1], ('v3f', vertexes[3]),
+                               tex_coords)  # right
+
+        self.particleBatch.add(4, mode, self.panorama[5], ('v3f', vertexes[4]),
+                               tex_coords)  # bottom
+
+        self.particleBatch.add(4, mode, self.panorama[4], ('v3f', vertexes[5]),
+                               tex_coords)  # top
+
     def updateScene(self):
-        # self.time += 1 * MAX_FPS / 100
+        # self.time += 1 * clock.get_fps() / 1000
         # print(self.time)
-        if 240 < self.time:
-            self.lightingColor[0] = 240 - self.time + 100
-            self.lightingColor[1] = 240 - self.time + 100
-            self.lightingColor[2] = 240 - self.time + 100
+        if 200 < self.time < 320:
+            self.lightingColor = 200 - self.time + 200
+        if 500 < self.time < 620:
+            self.lightingColor = 700 - self.time
 
         self.drawCounter += 1
         if self.drawCounter > 1 and self.chunkg > 0:
@@ -121,10 +165,12 @@ class Scene:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
-        glColor3d(self.lightingColor[0] / 255, self.lightingColor[1] / 255, self.lightingColor[2] / 255)
+        glColor3d(self.lightingColor / 255, self.lightingColor / 255, self.lightingColor / 255)
 
         self.player.update()
         self.draw()
+
+        self.drawPanorama()
 
         for i in self.entity:
             i.update()

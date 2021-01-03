@@ -11,10 +11,11 @@ WIDTH = monitor.current_w
 HEIGHT = monitor.current_h
 MAX_FPS = 100
 PAUSE = False
+IN_MENU = False
 clock = pygame.time.Clock()
 
 FOV = 100
 RENDER_DISTANCE = 100
 
-CHUNKS_RENDER_DISTANCE = 100
+CHUNKS_RENDER_DISTANCE = 900
 CHUNK_SIZE = (2, 50, 2)

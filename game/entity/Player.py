@@ -143,16 +143,16 @@ class Player:
             if col2 in self.gl.cubes.cubes:
                 self.gl.blockSound.playStepSound(self.gl.cubes.cubes[col2].name)
         # Dynamic FOV
-        '''if self.position[0] != col[0] or self.position[2] != col[2]:
-            if self.gl.fov < FOV + 20:
-                self.gl.fov += 0.2
-            else:
-                self.gl.fov = FOV + 20
-        else:
-            if self.gl.fov > FOV:
-                self.gl.fov -= 0.2
-            else:
-                self.gl.fov = FOV'''
+        # if self.position[0] != col[0] or self.position[2] != col[2]:
+        #    if self.gl.fov < FOV + 20:
+        #        self.gl.fov += 0.2
+        #    else:
+        #        self.gl.fov = FOV + 20
+        # else:
+        #    if self.gl.fov > FOV:
+        #        self.gl.fov -= 0.2
+        #    else:
+        #        self.gl.fov = FOV
         #
         if not self.bInAir:
             for i in range(1, 6):

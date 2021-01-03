@@ -10,17 +10,68 @@ from settings import *
 from OpenGL.GL import *
 
 
-def drawInfoLabel(text):
-    y = 0
+def drawInfoLabel(text, xx=0, yy=0, style=[]):
+    y = -21
     for i in text.split("\n"):
+        ix = 2
+        iy = HEIGHT + y + yy - 2
+        if xx:
+            ix = xx + 2
+        if yy:
+            iy = yy - 2
+        shadow_lbl = pyglet.text.Label(i,
+                                       font_name='Minecraft Rus',
+                                       color=(100, 100, 100, 255),
+                                       font_size=15,
+                                       x=ix, y=iy)
         lbl = pyglet.text.Label(i,
                                 font_name='Minecraft Rus',
                                 color=(255, 255, 255, 255),
                                 font_size=15,
-                                x=0, y=WIDTH // 2 + y)
-        lbl.set_style("background_color", (104, 104, 104, 160))
+                                x=ix - 2, y=iy + 2)
+        if not style:
+            lbl.set_style("background_color", (104, 104, 104, 160))
+        else:
+            for st in style:
+                lbl.set_style(st[0], st[1])
+        shadow_lbl.draw()
         lbl.draw()
         y -= 21
+
+
+def drawMainMenu():
+    global mainMenuRotation
+    glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.7, 1, 1))
+    glFogf(GL_FOG_START, 60)
+    glFogf(GL_FOG_END, 120)
+
+    scene.set3d()
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+
+    glPushMatrix()
+    glRotatef(mainMenuRotation[0], 1, 0, 0)
+    glRotatef(mainMenuRotation[1], 0, 1, 0)
+
+    scene.draw()
+    scene.drawPanorama()
+
+    glPopMatrix()
+    scene.set2d()
+
+    tex = gui.GUI_TEXTURES["game_logo"]
+    tex.blit(WIDTH // 2 - (tex.width // 2), HEIGHT - tex.height - (HEIGHT // 15))
+
+    but_tex = gui.GUI_TEXTURES["button_bg"]
+    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2)
+    drawInfoLabel("Singleplayer", xx=WIDTH // 2, yy=HEIGHT // 2, style=[('anchor_x', 'center')])
+
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
+
+    mainMenuRotation[0] = 50
+    mainMenuRotation[1] += 0.04
 
 
 print("Loading the game...")
@@ -116,6 +167,10 @@ gui.GUI_TEXTURES = {
     "fullheart": pyglet.resource.image("gui/fullheart.png"),
     "halfheart": pyglet.resource.image("gui/halfheart.png"),
     "heartbg": pyglet.resource.image("gui/heartbg.png"),
+    "game_logo": pyglet.resource.image("gui/game_logo.png"),
+    "button_bg": pyglet.resource.image("gui/gui_elements/button_bg.png"),
+    "button_bg_hover": pyglet.resource.image("gui/gui_elements/button_bg_hover.png"),
+    "edit_bg": pyglet.resource.image("gui/gui_elements/edit_bg.png"),
 }
 
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -139,38 +194,60 @@ texture = gui.GUI_TEXTURES["heartbg"]
 texture.width *= 2
 texture.height *= 2
 
+texture = gui.GUI_TEXTURES["game_logo"]
+texture.width *= 2
+texture.height *= 2
+
+texture = gui.GUI_TEXTURES["button_bg"]
+texture.width *= 2
+texture.height *= 2
+
+texture = gui.GUI_TEXTURES["button_bg_hover"]
+texture.width *= 2
+texture.height *= 2
+
+texture = gui.GUI_TEXTURES["edit_bg"]
+texture.width *= 2
+texture.height *= 2
+
 gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
 print("Loading complete!")
+mainMenuRotation = [0, 180]
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                PAUSE = not PAUSE
-            if event.key == pygame.K_F3:
-                showInfoLabel = not showInfoLabel
-            if event.key == pygame.K_F5:
-                player.cameraType += 1
-                if player.cameraType > 3:
-                    player.cameraType = 1
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            player.mouseEvent(event.button)
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 4:
-                player.inventory.activeInventory -= 1
-                if player.inventory.activeInventory < 0:
-                    player.inventory.activeInventory = 8
-                gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
-            elif event.button == 5:
-                player.inventory.activeInventory += 1
-                if player.inventory.activeInventory > 8:
-                    player.inventory.activeInventory = 0
-                gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
+        if not IN_MENU:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    PAUSE = not PAUSE
+                if event.key == pygame.K_F3:
+                    showInfoLabel = not showInfoLabel
+                if event.key == pygame.K_F5:
+                    player.cameraType += 1
+                    if player.cameraType > 3:
+                        player.cameraType = 1
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                player.mouseEvent(event.button)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    player.inventory.activeInventory -= 1
+                    if player.inventory.activeInventory < 0:
+                        player.inventory.activeInventory = 8
+                    gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
+                elif event.button == 5:
+                    player.inventory.activeInventory += 1
+                    if player.inventory.activeInventory > 8:
+                        player.inventory.activeInventory = 0
+                    gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
     pygame.mouse.set_visible(PAUSE)
+
+    if IN_MENU:
+        drawMainMenu()
+
     if PAUSE:
         continue
     sound.playMusic()
