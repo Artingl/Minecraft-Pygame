@@ -21,8 +21,8 @@ class worldGenerator:
         sx, sy, sz = CHUNK_SIZE
         xx, zz = XX * (sx - 1), YY * (sz - 1)
 
-        for x in range(xx, xx + sx):
-            for z in range(zz, zz + sz):
+        for x in range(xx, xx + 1):
+            for z in range(zz, zz + 1):
                 sand = False
                 y = self.worldPerlin(x, z) + sy
                 if random.randint(0, 120) == 20 and y > sy - 5:

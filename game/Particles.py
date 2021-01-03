@@ -19,7 +19,8 @@ class Particles:
 
         for i in range(count):
             dx, dy, dz = choice(numbers), choice(numbers), choice(numbers)
-            self.particles.append([list(p), cubeClass, randint(1, 4) / 10, [dx, dy, dz], .001, direction, 0.02])
+            ps = randint(4, 8) / 1000  # 0.005
+            self.particles.append([list(p), cubeClass, randint(1, 4) / 10, [dx, dy, dz], .001, direction, 0.02, ps])
 
     def drawParticles(self):
         if not self.particles:
@@ -37,28 +38,28 @@ class Particles:
                         i[0][1] += i[6]
                         i[0][2] += i[3][2] / 100
 
-                        i[6] -= 0.005
+                        i[6] -= i[7]
                 elif i[5] == "up":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
                         i[0][0] += i[3][0] / 100
                         i[0][1] += i[6]
                         i[0][2] += i[3][2] / 100
 
-                        i[6] += 0.005
+                        i[6] += i[7]
                 elif i[5] == "left":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
                         i[0][0] += i[6]
                         i[0][1] += i[3][1] / 100
                         i[0][2] += i[6]
 
-                        i[6] -= 0.005
+                        i[6] -= i[7]
                 elif i[5] == "right":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
                         i[0][0] += i[6]
                         i[0][1] += i[3][1] / 100
                         i[0][2] += i[6]
 
-                        i[6] += 0.005
+                        i[6] += i[7]
             else:
                 i[0][0] += i[3][0] / 50
                 i[0][2] += i[3][2] / 50

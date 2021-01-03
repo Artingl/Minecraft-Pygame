@@ -49,8 +49,8 @@ class Scene:
 
         glClearColor(0.5, 0.7, 1, 1)
         glClearDepth(1.0)
-        glDepthFunc(GL_LESS)
         glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LESS)
         glShadeModel(GL_SMOOTH)
         glMatrixMode(GL_PROJECTION)
         glEnable(GL_DEPTH_TEST)
@@ -93,7 +93,12 @@ class Scene:
         glLoadIdentity()
 
     def updateScene(self):
-        self.time += 9 * clock.tick() / 100
+        # self.time += 1 * MAX_FPS / 100
+        # print(self.time)
+        if 240 < self.time:
+            self.lightingColor[0] = 240 - self.time + 100
+            self.lightingColor[1] = 240 - self.time + 100
+            self.lightingColor[2] = 240 - self.time + 100
 
         self.drawCounter += 1
         if self.drawCounter > 1 and self.chunkg > 0:
@@ -111,13 +116,12 @@ class Scene:
             glFogf(GL_FOG_END, 120)
 
         self.set3d()
-
         glClearColor(self.skyColor[0] / 255, self.skyColor[1] / 255, self.skyColor[2] / 255, 1)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
-        # glColor3d(self.lightingColor[0] / 255, self.lightingColor[1] / 255, self.lightingColor[2] / 255)
+        glColor3d(self.lightingColor[0] / 255, self.lightingColor[1] / 255, self.lightingColor[2] / 255)
 
         self.player.update()
         self.draw()
@@ -135,6 +139,7 @@ class Scene:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
             glColor3d(1, 1, 1)
 
+        glColor3d(1, 1, 1)
         glPopMatrix()
         self.set2d()
 
