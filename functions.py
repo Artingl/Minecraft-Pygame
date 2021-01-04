@@ -3,6 +3,7 @@ from random import randint
 
 import pyglet
 from OpenGL.raw.GL.VERSION.GL_1_0 import glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST
+from settings import *
 
 
 def load_textures(self):
@@ -102,3 +103,39 @@ def spiral(n):
             dx, dy = -dy, dx
             x, y = x+dx, y+dy
     return arr1
+
+
+def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1):
+    if style is None:
+        style = []
+    y = -21
+    for i in text.split("\n"):
+        ix = 2
+        iy = HEIGHT + y + yy - 2
+        if xx:
+            ix = xx + 2
+        if yy:
+            iy = yy - 2
+        shadow_lbl = pyglet.text.Label(i,
+                                       font_name='Minecraft Rus',
+                                       color=(63, 63, 63, round(opacity * 255)),
+                                       font_size=size,
+                                       x=ix, y=iy,
+                                       anchor_x=anchor_x,
+                                       anchor_y=anchor_y)
+        lbl = pyglet.text.Label(i,
+                                font_name='Minecraft Rus',
+                                color=(255, 255, 255, round(opacity * 255)),
+                                font_size=size,
+                                x=ix - 2, y=iy + 2,
+                                anchor_x=anchor_x,
+                                anchor_y=anchor_y)
+        if not style:
+            lbl.set_style("background_color", (104, 104, 104, 160))
+        else:
+            for st in style:
+                lbl.set_style(st[0], st[1])
+                shadow_lbl.set_style(st[0], st[1])
+        shadow_lbl.draw()
+        lbl.draw()
+        y -= 21

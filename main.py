@@ -1,5 +1,6 @@
 import os
 
+from functions import drawInfoLabel
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
 from Gui import Gui
@@ -8,42 +9,6 @@ from game.entity.Player import Player
 from openGL.Scene import Scene
 from settings import *
 from OpenGL.GL import *
-
-
-def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline'):
-    if style is None:
-        style = []
-    y = -21
-    for i in text.split("\n"):
-        ix = 2
-        iy = HEIGHT + y + yy - 2
-        if xx:
-            ix = xx + 2
-        if yy:
-            iy = yy - 2
-        shadow_lbl = pyglet.text.Label(i,
-                                       font_name='Minecraft Rus',
-                                       color=(63, 63, 63, 255),
-                                       font_size=size,
-                                       x=ix, y=iy,
-                                       anchor_x=anchor_x,
-                                       anchor_y=anchor_y)
-        lbl = pyglet.text.Label(i,
-                                font_name='Minecraft Rus',
-                                color=(255, 255, 255, 255),
-                                font_size=size,
-                                x=ix - 2, y=iy + 2,
-                                anchor_x=anchor_x,
-                                anchor_y=anchor_y)
-        if not style:
-            lbl.set_style("background_color", (104, 104, 104, 160))
-        else:
-            for st in style:
-                lbl.set_style(st[0], st[1])
-                shadow_lbl.set_style(st[0], st[1])
-        shadow_lbl.draw()
-        lbl.draw()
-        y -= 21
 
 
 def checkHover(ox, oy, ow, oh, mx, my):
@@ -95,7 +60,15 @@ def drawMainMenu(mc):
     pygame.display.flip()
     clock.tick(MAX_FPS)
 
-    mainMenuRotation[0] = 50
+    if mainMenuRotation[0] < 25:
+        mainMenuRotation[2] = False
+    if mainMenuRotation[0] > 75:
+        mainMenuRotation[2] = True
+
+    if mainMenuRotation[2]:
+        mainMenuRotation[0] -= 0.02
+    else:
+        mainMenuRotation[0] += 0.02
     mainMenuRotation[1] += 0.04
 
 
@@ -239,7 +212,7 @@ gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
 print("Loading complete!")
-mainMenuRotation = [0, 180]
+mainMenuRotation = [50, 180, True]
 
 while True:
     mbclicked = None

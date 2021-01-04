@@ -170,8 +170,6 @@ class Scene:
         self.player.update()
         self.draw()
 
-        self.drawPanorama()
-
         for i in self.entity:
             i.update()
 
