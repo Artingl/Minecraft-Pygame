@@ -132,6 +132,14 @@ class Scene:
         self.stuffBatch.add(4, mode, self.panorama[4], ('v3f', vertexes[5]),
                             tex_coords)  # top
 
+    def genWorld(self):
+        self.drawCounter += 1
+        if self.drawCounter > 1 and self.chunkg > 0:
+            self.drawCounter = 0
+            x, y = self.worldSp[self.chunkg]
+            self.chunkg -= 1
+            self.worldGen.genChunk(CHUNKS_RENDER_DISTANCE // 2 - x, CHUNKS_RENDER_DISTANCE // 2 - y, self.player)
+
     def updateScene(self):
         # self.time += 1 * clock.get_fps() / 1000
         # print(self.time)
@@ -140,12 +148,7 @@ class Scene:
         if 500 < self.time < 620:
             self.lightingColor = 700 - self.time
 
-        self.drawCounter += 1
-        if self.drawCounter > 1 and self.chunkg > 0:
-            self.drawCounter = 0
-            x, y = self.worldSp[self.chunkg]
-            self.chunkg -= 1
-            self.worldGen.genChunk(CHUNKS_RENDER_DISTANCE // 2 - x, CHUNKS_RENDER_DISTANCE // 2 - y, self.player)
+        self.genWorld()
         if self.in_water:
             glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0, 0, 0, 1))
             glFogf(GL_FOG_START, 10)

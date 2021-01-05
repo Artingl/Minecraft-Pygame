@@ -28,7 +28,7 @@ class Player:
         self.bInAir = False
         self.inventory = None
 
-        self.lastPlayerPosOnGround = []
+        self.lastPlayerPosOnGround = [0, 0, 0]
         self.playerFallY = 0
 
     def setCameraShake(self):
@@ -46,7 +46,7 @@ class Player:
 
     def setShift(self, b):
         if b:
-            if self.shift < 0.3:
+            if self.shift < 0.17:
                 self.shift += 0.05
         else:
             if self.shift > 0:
@@ -67,12 +67,12 @@ class Player:
         DX, DY, DZ = 0, 0, 0
 
         rotY = self.rotation[1] / 180 * math.pi
-        dx, dz = (self.speed + self.acceleration) * math.sin(rotY), \
-                 (self.speed + self.acceleration) * math.cos(rotY)
+        dx, dz = (self.speed + self.acceleration + 0.01) * math.sin(rotY), \
+                 (self.speed + self.acceleration + 0.01) * math.cos(rotY)
 
         key = pygame.key.get_pressed()
         if key[pygame.K_LCTRL]:
-            self.acceleration = 0.02
+            self.acceleration = 0.009
         if key[pygame.K_w]:
             DX += dx
             DZ -= dz

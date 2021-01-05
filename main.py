@@ -5,7 +5,7 @@ from functions import drawInfoLabel
 from game.GUI.Button import Button
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
-from Gui import Gui
+from game.GUI.GUI import GUI
 import pyglet
 from game.entity.Player import Player
 from openGL.Scene import Scene
@@ -14,10 +14,41 @@ from OpenGL.GL import *
 
 
 def startNewGame():
-    global IN_MENU, PAUSE
+    global mainFunction
     menuChannelSound.stop()
-    IN_MENU = False
-    PAUSE = False
+    mainFunction = genWorld
+
+
+def genWorld(mbclicked):
+    global IN_MENU, PAUSE
+
+    tex = gui.GUI_TEXTURES["options_background"]
+    tex2 = gui.GUI_TEXTURES["black"]
+    if scene.chunkg == len(scene.worldSp):
+        for x in range(0, WIDTH, tex.width):
+            for y in range(0, HEIGHT, tex.height):
+                tex.blit(x, y)
+                tex2.blit(x, y)
+    else:
+        for x in range(-2, 2):
+            for y in range(-2, 2):
+                ix, iy = (WIDTH // 2) + (x * tex.width), (HEIGHT // 2) + (y * tex.height)
+
+                tex.blit(ix, iy)
+                tex2.blit(ix, iy)
+
+    scene.genWorld()
+    if len(scene.worldSp) - scene.chunkg > 120:
+        IN_MENU = False
+        PAUSE = False
+
+    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 120)
+    drawInfoLabel("Loading world...", xx=WIDTH // 2, yy=HEIGHT // 2, style=[('', '')], size=14, anchor_x='center')
+    drawInfoLabel(f"Generating terrain {proc}%...", xx=WIDTH // 2, yy=HEIGHT // 2 - 39,
+                  style=[('', '')], size=12, anchor_x='center')
+
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
 
 
 def drawMainMenu(mc):
@@ -57,19 +88,6 @@ def drawMainMenu(mc):
     quitButton.x = WIDTH // 2 - (quitButton.button.width // 2)
     quitButton.y = HEIGHT // 2 - (quitButton.button.height // 2) + 25
     quitButton.update(mp, mc)
-
-    '''button = gui.GUI_TEXTURES["button_bg"]
-    if checkHover(WIDTH // 2 - (button.width // 2), HEIGHT // 2 - (button.height // 2) + 50,
-                  button.width, button.height,
-                  mp[0], mp[1]):
-        button = gui.GUI_TEXTURES["button_bg_hover"]
-        if mc == 1:
-            sound.playGuiSound("click")
-            exit()
-
-    button.blit(WIDTH // 2 - (button.width // 2), HEIGHT // 2 - (button.height // 2) - 50)
-    drawInfoLabel("Quit game", xx=WIDTH // 2, yy=HEIGHT // 2 - (button.height // 2) + 14 - 50, style=[('', '')],
-                  size=12, anchor_x='center')'''
     #
 
     pygame.display.flip()
@@ -92,7 +110,7 @@ print("Loading the game...")
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
 pygame.display.set_caption("Minecraft 1.5.2")
 
-gui = Gui()
+gui = GUI()
 sound = Sound()
 scene = Scene()
 blockSound = BlockSound(scene)
@@ -196,7 +214,10 @@ gui.GUI_TEXTURES = {
     "button_bg": pyglet.resource.image("gui/gui_elements/button_bg.png"),
     "button_bg_hover": pyglet.resource.image("gui/gui_elements/button_bg_hover.png"),
     "edit_bg": pyglet.resource.image("gui/gui_elements/edit_bg.png"),
+    "options_background": pyglet.resource.image("gui/gui_elements/options_background.png"),
+    "black": pyglet.resource.image("gui/gui_elements/black.png"),
 }
+
 
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 texture = gui.GUI_TEXTURES["inventory"]
@@ -235,6 +256,14 @@ texture = gui.GUI_TEXTURES["edit_bg"]
 texture.width *= 2
 texture.height *= 2
 
+texture = gui.GUI_TEXTURES["options_background"]
+texture.width *= 6
+texture.height *= 6
+
+texture = gui.GUI_TEXTURES["black"]
+texture.width *= 6
+texture.height *= 6
+
 gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
@@ -259,6 +288,8 @@ quitButton.setEvent(exit)
 
 print("Loading complete!")
 mainMenuRotation = [50, 180, True]
+
+mainFunction = drawMainMenu
 
 while True:
     mbclicked = None
@@ -311,7 +342,7 @@ while True:
     pygame.mouse.set_visible(PAUSE)
 
     if IN_MENU:
-        drawMainMenu(mbclicked)
+        mainFunction(mbclicked)
 
     if PAUSE:
         continue

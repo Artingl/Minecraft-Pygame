@@ -2,7 +2,7 @@ import pyglet
 from settings import *
 
 
-class Gui:
+class GUI:
     def __init__(self):
         print("Init GUI class...")
 
