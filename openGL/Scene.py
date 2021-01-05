@@ -3,13 +3,12 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from pyglet.gl import *
 
-from game.entity.Inventory import Inventory
+from functions import *
 from game.Particles import Particles
+from game.entity.Inventory import Inventory
 from game.entity.Zombie import Zombie
 from game.world.worldGenerator import worldGenerator
 from openGL.CubeHandler import CubeHandler
-from settings import *
-from functions import *
 
 
 class Scene:

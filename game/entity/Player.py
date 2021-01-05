@@ -12,10 +12,10 @@ class Player:
         print("Init Player class...")
 
         self.position, self.rotation = [x, y, z], rotation
-        self.speed = 0.03
+        self.speed = 0.02
         self.gl = gl
         self.gravity = 3.8
-        self.jSpeed = (4 * self.gravity) ** .5
+        self.jSpeed = (4 * self.gravity) ** .46
         self.tVel = 50
         self.dy = 0
         self.shift = 0

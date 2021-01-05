@@ -2,6 +2,7 @@ import os
 from random import randint
 
 from functions import drawInfoLabel
+from game.GUI.Button import Button
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
 from Gui import Gui
@@ -12,10 +13,11 @@ from settings import *
 from OpenGL.GL import *
 
 
-def checkHover(ox, oy, ow, oh, mx, my):
-    if ox < mx < ox + ow and oy < my < oy + oh:
-        return True
-    return False
+def startNewGame():
+    global IN_MENU, PAUSE
+    menuChannelSound.stop()
+    IN_MENU = False
+    PAUSE = False
 
 
 def drawMainMenu(mc):
@@ -46,33 +48,28 @@ def drawMainMenu(mc):
     tex.blit(WIDTH // 2 - (tex.width // 2), HEIGHT - tex.height - (HEIGHT // 15))
 
     # Singleplayer button
-    but_tex = gui.GUI_TEXTURES["button_bg"]
-    if checkHover(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2),
-                  but_tex.width, but_tex.height,
-                  mp[0], mp[1]):
-        but_tex = gui.GUI_TEXTURES["button_bg_hover"]
-        if mc == 1:
-            menuChannelSound.stop()
-            IN_MENU = False
-            PAUSE = False
-
-    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2))
-    drawInfoLabel("Singleplayer", xx=WIDTH // 2, yy=HEIGHT // 2 - (but_tex.height // 2) + 14, style=[('', '')],
-                  size=12, anchor_x='center')
+    singleplayerButton.x = WIDTH // 2 - (singleplayerButton.button.width // 2)
+    singleplayerButton.y = HEIGHT // 2 - (singleplayerButton.button.height // 2) - 25
+    singleplayerButton.update(mp, mc)
     #
 
     # Quit button
-    but_tex = gui.GUI_TEXTURES["button_bg"]
-    if checkHover(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2) + 50,
-                  but_tex.width, but_tex.height,
+    quitButton.x = WIDTH // 2 - (quitButton.button.width // 2)
+    quitButton.y = HEIGHT // 2 - (quitButton.button.height // 2) + 25
+    quitButton.update(mp, mc)
+
+    '''button = gui.GUI_TEXTURES["button_bg"]
+    if checkHover(WIDTH // 2 - (button.width // 2), HEIGHT // 2 - (button.height // 2) + 50,
+                  button.width, button.height,
                   mp[0], mp[1]):
-        but_tex = gui.GUI_TEXTURES["button_bg_hover"]
+        button = gui.GUI_TEXTURES["button_bg_hover"]
         if mc == 1:
+            sound.playGuiSound("click")
             exit()
 
-    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2) - 50)
-    drawInfoLabel("Quit game", xx=WIDTH // 2, yy=HEIGHT // 2 - (but_tex.height // 2) + 14 - 50, style=[('', '')],
-                  size=12, anchor_x='center')
+    button.blit(WIDTH // 2 - (button.width // 2), HEIGHT // 2 - (button.height // 2) - 50)
+    drawInfoLabel("Quit game", xx=WIDTH // 2, yy=HEIGHT // 2 - (button.height // 2) + 14 - 50, style=[('', '')],
+                  size=12, anchor_x='center')'''
     #
 
     pygame.display.flip()
@@ -168,6 +165,18 @@ for e, i in enumerate(os.listdir("sounds/damage/")):
     sound.SOUNDS["damage"][soundName].append(pygame.mixer.Sound("sounds/damage/" + i))
     print("Successful loaded", soundName, "#" + soundNum, "sound!")
 
+print("Loading GUI sounds...")
+sound.SOUNDS["GUI"] = {}
+for e, i in enumerate(os.listdir("sounds/gui/")):
+    soundName = i.split(".")[0][:-1]
+    soundNum = i.split(".")[0][-1]
+
+    if soundName not in sound.SOUNDS["GUI"]:
+        sound.SOUNDS["GUI"][soundName] = []
+
+    sound.SOUNDS["GUI"][soundName].append(pygame.mixer.Sound("sounds/gui/" + i))
+    print("Successful loaded", soundName, "#" + soundNum, "sound!")
+
 print("Loading music...")
 for e, i in enumerate(os.listdir("sounds/music/")):
     sound.MUSIC.append("sounds/music/" + i)
@@ -241,6 +250,12 @@ for i in range(len(menuSound)):
 menuChannelSound.play()
 menuChannelSound.queue(menuSound[i])
 menuChannelSound.set_volume(sound.volume)
+
+singleplayerButton = Button(scene, "Singleplayer", 0, 0)
+quitButton = Button(scene, "Quit game", 0, 0)
+
+singleplayerButton.setEvent(startNewGame)
+quitButton.setEvent(exit)
 
 print("Loading complete!")
 mainMenuRotation = [50, 180, True]

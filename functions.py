@@ -139,3 +139,9 @@ def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor
         shadow_lbl.draw()
         lbl.draw()
         y -= 21
+
+
+def checkHover(ox, oy, ow, oh, mx, my):
+    if ox < mx < ox + ow and oy < my < oy + oh:
+        return True
+    return False
