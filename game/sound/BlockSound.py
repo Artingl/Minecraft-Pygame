@@ -17,7 +17,7 @@ class BlockSound:
             blName = "gravel"
         if blockName == "sand":
             blName = "sand"
-        if blockName.startswith("log"):
+        if blockName.startswith("log") or blockName == "crafting_table":
             blName = "wood"
         if blockName.endswith("wool"):
             blName = "cloth"

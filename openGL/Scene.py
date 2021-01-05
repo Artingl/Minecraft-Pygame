@@ -15,6 +15,14 @@ class Scene:
     def __init__(self):
         print("Init Scene class...")
 
+        self.WIDTH, self.HEIGHT = WIDTH, HEIGHT
+        self.allowEvents = {
+            "movePlayer": True,
+            "grabMouse": True,
+            "keyboard": True,
+            "showCrosshair": True,
+        }
+
         self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
         self.chunkg = len(self.worldSp)
         self.drawCounter = 0
@@ -27,6 +35,7 @@ class Scene:
         self.player = None
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV
+        self.updateEvents = []
         self.entity = []
         self.time = 200
         self.skyColor = [128, 179, 255]
@@ -34,7 +43,6 @@ class Scene:
         self.nskyColor = [4, 6, 10]
         self.lightingColor = 200
         self.startPlayerPos = [0, -90, 0]
-        self.entity = []
         self.panorama = {}
 
     def loadPanoramaTextures(self):
@@ -42,12 +50,13 @@ class Scene:
         for e, i in enumerate(os.listdir("gui/bg/")):
             self.panorama[e] = \
                 pyglet.graphics.TextureGroup(pyglet.image.load("gui/bg/" + i).get_mipmapped_texture())
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
     def vertexList(self):
-        x, y, w, h = WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT
+        x, y, w, h = self.WIDTH / 2, self.HEIGHT / 2, self.WIDTH, self.HEIGHT
         self.reticle = pyglet.graphics.vertex_list(4, ('v2f', (x - 10, y, x + 10, y, x, y - 10, x, y + 10)),
                                                    ('c3f', (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
 
@@ -90,15 +99,24 @@ class Scene:
     def set2d(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluOrtho2D(0, WIDTH, 0, HEIGHT)
+        gluOrtho2D(0, self.WIDTH, 0, self.HEIGHT)
 
     def set3d(self):
         glLoadIdentity()
-        gluPerspective(self.fov, (WIDTH / HEIGHT), 0.1, RENDER_DISTANCE)
+        gluPerspective(self.fov, (self.WIDTH / self.HEIGHT), 0.1, RENDER_DISTANCE)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
+    def resizeCGL(self, w, h, changeRes=True):
+        if changeRes:
+            self.WIDTH = w
+            self.HEIGHT = h
+        self.vertexList()
+        glViewport(0, 0, w, h)
+
     def drawPanorama(self):
+        # self.resizeCGL(256, 256, changeRes=False)
+
         pp = self.player.position
         sx, sy, sz = 60, 60, 60
 
@@ -131,6 +149,9 @@ class Scene:
 
         self.stuffBatch.add(4, mode, self.panorama[4], ('v3f', vertexes[5]),
                             tex_coords)  # top
+
+        # glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256)
+        # self.resizeCGL(self.WIDTH, self.HEIGHT, changeRes=False)
 
     def genWorld(self):
         self.drawCounter += 1
@@ -185,6 +206,9 @@ class Scene:
         glColor3d(1, 1, 1)
         glPopMatrix()
         self.set2d()
+
+        for i in self.updateEvents:
+            i()
 
     def draw(self):
         glEnable(GL_ALPHA_TEST)

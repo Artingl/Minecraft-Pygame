@@ -34,18 +34,22 @@ class Particles:
             if i[5] != "no":
                 if i[5] == "down":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
-                        i[0][0] += i[3][0] / 100
                         i[0][1] += i[6]
-                        i[0][2] += i[3][2] / 100
+                    else:
+                        i[7] /= 2
+                    i[0][0] += i[3][0] / 100
+                    i[0][2] += i[3][2] / 100
 
-                        i[6] -= i[7]
+                    i[6] -= i[7]
                 elif i[5] == "up":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
-                        i[0][0] += i[3][0] / 100
                         i[0][1] += i[6]
-                        i[0][2] += i[3][2] / 100
+                    else:
+                        i[7] /= 2
+                    i[0][0] += i[3][0] / 100
+                    i[0][2] += i[3][2] / 100
 
-                        i[6] += i[7]
+                    i[6] += i[7]
                 elif i[5] == "left":
                     if roundPos((i[0][0], i[0][1], i[0][2])) not in self.gl.cubes.cubes:
                         i[0][0] += i[6]

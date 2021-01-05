@@ -225,7 +225,6 @@ Undefeated!
 Kinda like Lemmings!
 Follow the train, CJ!
 Leveraging synergy!
-This message will never appear on the splash screen, isn't that weird?
 DungeonQuest is unfair!
 90210!
 Check out the far lands!
@@ -298,7 +297,7 @@ Put that cookie down!
 Pretty scary!
 I have a suggestion.
 Now with extra hugs!
-Now Java 8!
+Now python 3.8!
 Woah.
 HURNERJSGER?
 What's up, Doc?

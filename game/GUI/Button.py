@@ -28,6 +28,6 @@ class Button:
                 if self.event:
                     self.event()
 
-        self.button.blit(self.x, HEIGHT - self.y - self.button.height)
-        drawInfoLabel(self.text, xx=WIDTH // 2, yy=HEIGHT - self.y - 25, style=[('', '')],
+        self.button.blit(self.x, self.gl.HEIGHT - self.y - self.button.height)
+        drawInfoLabel(self.gl, self.text, xx=self.gl.WIDTH // 2, yy=self.gl.HEIGHT - self.y - 25, style=[('', '')],
                       size=12, anchor_x='center')

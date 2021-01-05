@@ -105,14 +105,14 @@ def spiral(n):
     return arr1
 
 
-def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1, rotate=0,
+def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1, rotate=0,
                   label_color=(255, 255, 255), shadow_color=(56, 56, 56), scale=0):
     if style is None:
         style = []
     y = -21
     for i in text.split("\n"):
         ix = 2
-        iy = HEIGHT + y + yy - 2
+        iy = gl.HEIGHT + y + yy - 2
         if xx:
             ix = xx + 2
         if yy:

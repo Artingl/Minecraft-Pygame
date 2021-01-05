@@ -3,24 +3,26 @@ from settings import *
 
 
 class GUI:
-    def __init__(self):
+    def __init__(self, gl):
         print("Init GUI class...")
 
         self.GUI_TEXTURES = {}
         self.shows = {}
+        self.gl = gl
 
         self.lopacity = 255
         self.label = pyglet.text.Label("",
                                        font_name='Minecraft Rus',
                                        color=(255, 255, 255, 255),
                                        font_size=17,
-                                       x=WIDTH // 2, y=90, anchor_x='center')
+                                       x=self.gl.WIDTH // 2, y=90, anchor_x='center')
 
     def showText(self, text):
         self.label.text = text
         self.lopacity = 255
 
     def update(self):
+        self.label.x = self.gl.WIDTH // 2
         self.lopacity -= 1
         if self.lopacity < 0:
             self.lopacity = 1

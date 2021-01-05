@@ -20,17 +20,17 @@ class Inventory:
         for i in range(10):
             old = not old
             self.heartAnimation.append([0, '-' if old else '+'])
-        for i in range(9):
+        for i in range(9*4 + 1):
             block = ls[i][0]
             if i == 0:
-                block = "tnt"
+                block = "crafting_table"
 
             self.inventory[i] = [block, 64]
             self.blocksLabel[i] = pyglet.text.Label("0",
                                                     font_name='Minecraft Rus',
                                                     color=(255, 255, 255, 255),
                                                     font_size=10,
-                                                    x=WIDTH // 2, y=60)
+                                                    x=self.gl.WIDTH // 2, y=60)
 
     def draw(self):
         inventory = self.gl.gui.GUI_TEXTURES["inventory"]
@@ -40,8 +40,8 @@ class Inventory:
         halfheart = self.gl.gui.GUI_TEXTURES["halfheart"]
         heartbg = self.gl.gui.GUI_TEXTURES["heartbg"]
 
-        inventory.blit(WIDTH // 2 - (inventory.width // 2), 0)
-        sel_inventory.blit((WIDTH // 2 - (inventory.width // 2)) +
+        inventory.blit(self.gl.WIDTH // 2 - (inventory.width // 2), 0)
+        sel_inventory.blit((self.gl.WIDTH // 2 - (inventory.width // 2)) +
                            (40 * self.activeInventory), 0)
 
         if self.gl.inventory_textures:
@@ -49,8 +49,8 @@ class Inventory:
                 if self.inventory[i][1] == 0:
                     continue
                 self.gl.inventory_textures[self.inventory[i][0]].blit(
-                    (WIDTH // 2 - (inventory.width // 2)) + (40 * i) + 11, 11)
-                self.blocksLabel[i].x = (WIDTH // 2 - (inventory.width // 2)) + (40 * i) + 22
+                    (self.gl.WIDTH // 2 - (inventory.width // 2)) + (40 * i) + 11, 11)
+                self.blocksLabel[i].x = (self.gl.WIDTH // 2 - (inventory.width // 2)) + (40 * i) + 22
                 self.blocksLabel[i].y = 6
                 self.blocksLabel[i].text = str(self.inventory[i][1])
                 self.blocksLabel[i].draw()
@@ -69,12 +69,12 @@ class Inventory:
                 elif self.heartAnimation[i][0] < -2:
                     self.heartAnimation[i][1] = "+"
 
-            heartbg.blit((WIDTH // 2 - (inventory.width // 2)) + ((heartbg.width - 1) * i),
+            heartbg.blit((self.gl.WIDTH // 2 - (inventory.width // 2)) + ((heartbg.width - 1) * i),
                          inventory.height + 10 + ay)
 
         cntr = 0
         ch = 0
-        x = (WIDTH // 2 - (inventory.width // 2)) + 2
+        x = (self.gl.WIDTH // 2 - (inventory.width // 2)) + 2
         for i in range(self.gl.player.hp):
             ay = 0
             if self.gl.player.hp <= 3:

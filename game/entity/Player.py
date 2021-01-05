@@ -53,68 +53,71 @@ class Player:
                 self.shift -= 0.05
 
     def updatePosition(self):
-        rdx, rdy = pygame.mouse.get_pos()
-        rdx, rdy = rdx - WIDTH // 2, rdy - HEIGHT // 2
-        rdx /= 8
-        rdy /= 8
-        self.rotation[0] += rdy
-        self.rotation[1] += rdx
-        if self.rotation[0] > 90:
-            self.rotation[0] = 90
-        elif self.rotation[0] < -90:
-            self.rotation[0] = -90
+        if self.gl.allowEvents["movePlayer"]:
+            rdx, rdy = pygame.mouse.get_pos()
+            rdx, rdy = rdx - self.gl.WIDTH // 2, rdy - self.gl.HEIGHT // 2
+            rdx /= 8
+            rdy /= 8
+            self.rotation[0] += rdy
+            self.rotation[1] += rdx
+            if self.rotation[0] > 90:
+                self.rotation[0] = 90
+            elif self.rotation[0] < -90:
+                self.rotation[0] = -90
 
-        DX, DY, DZ = 0, 0, 0
+            DX, DY, DZ = 0, 0, 0
 
-        rotY = self.rotation[1] / 180 * math.pi
-        dx, dz = (self.speed + self.acceleration + 0.01) * math.sin(rotY), \
-                 (self.speed + self.acceleration + 0.01) * math.cos(rotY)
+            rotY = self.rotation[1] / 180 * math.pi
+            dx, dz = (self.speed + self.acceleration + 0.01) * math.sin(rotY), \
+                     (self.speed + self.acceleration + 0.01) * math.cos(rotY)
 
-        key = pygame.key.get_pressed()
-        if key[pygame.K_LCTRL]:
-            self.acceleration = 0.009
-        if key[pygame.K_w]:
-            DX += dx
-            DZ -= dz
-            self.setCameraShake()
-        else:
-            self.acceleration = 0
-        if key[pygame.K_s]:
-            DX -= dx
-            DZ += dz
-            self.setCameraShake()
-            self.acceleration = 0
-        if key[pygame.K_a]:
-            DX -= dz
-            DZ -= dx
-            self.setCameraShake()
-            self.acceleration = 0
-        if key[pygame.K_d]:
-            DX += dz
-            DZ += dx
-            self.setCameraShake()
-            self.acceleration = 0
-        if key[pygame.K_SPACE]:
-            self.jump()
-        if key[pygame.K_LSHIFT]:
-            self.setShift(True)
-            self.acceleration = -0.01
-        else:
-            self.setShift(False)
-            if self.acceleration == -0.01:
+            key = pygame.key.get_pressed()
+            if key[pygame.K_LCTRL]:
+                self.acceleration = 0.009
+            if key[pygame.K_w]:
+                DX += dx
+                DZ -= dz
+                self.setCameraShake()
+            else:
                 self.acceleration = 0
+            if key[pygame.K_s]:
+                DX -= dx
+                DZ += dz
+                self.setCameraShake()
+                self.acceleration = 0
+            if key[pygame.K_a]:
+                DX -= dz
+                DZ -= dx
+                self.setCameraShake()
+                self.acceleration = 0
+            if key[pygame.K_d]:
+                DX += dz
+                DZ += dx
+                self.setCameraShake()
+                self.acceleration = 0
+            if key[pygame.K_SPACE]:
+                self.jump()
+            if key[pygame.K_LSHIFT]:
+                self.setShift(True)
+                self.acceleration = -0.01
+            else:
+                self.setShift(False)
+                if self.acceleration == -0.01:
+                    self.acceleration = 0
 
-        dt = self.speed
+            dt = self.speed
 
-        self.position = [self.position[0] + DX, self.position[1] + DY, self.position[2] + DZ]
+            self.position = [self.position[0] + DX, self.position[1] + DY, self.position[2] + DZ]
 
-        if dt < 0.2:
-            dt /= 10
-            DX /= 10
-            DY /= 10
-            DZ /= 10
-            for i in range(10):
-                self.move(dt, DX, DY, DZ)
+            if dt < 0.2:
+                dt /= 10
+                DX /= 10
+                DY /= 10
+                DZ /= 10
+                for i in range(10):
+                    self.move(dt, DX, DY, DZ)
+        else:
+            self.move(self.speed, 0, 0, 0)
 
         glPushMatrix()
         glRotatef(self.rotation[0], 1, 0, 0)
