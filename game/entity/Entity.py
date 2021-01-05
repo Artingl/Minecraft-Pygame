@@ -1,22 +1,15 @@
 from OpenGL.GL import *
 
+from game.models.Model import Model
+
 
 class Entity:
-    def __init__(self):
+    def __init__(self, gl):
         self.position = [0, 0, 0]
         self.rotation = [0, 0, 0]
+        self.gl = gl
 
-        self.vertices = []
+        self.model = Model(gl)
 
     def update(self):
-        glBegin(GL_QUADS)
-
-        for i in self.vertices:
-            x, y, z = i
-            x += self.position[0]
-            y += self.position[1]
-            z += self.position[2]
-
-            glVertex3f(x, y, z)
-
-        glEnd()
+        self.model.drawModel(self.position, self.rotation)

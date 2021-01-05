@@ -1,4 +1,5 @@
 import os
+from random import randint
 
 from functions import drawInfoLabel
 from game.sound.BlockSound import BlockSound
@@ -44,18 +45,35 @@ def drawMainMenu(mc):
     tex = gui.GUI_TEXTURES["game_logo"]
     tex.blit(WIDTH // 2 - (tex.width // 2), HEIGHT - tex.height - (HEIGHT // 15))
 
+    # Singleplayer button
     but_tex = gui.GUI_TEXTURES["button_bg"]
     if checkHover(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2),
                   but_tex.width, but_tex.height,
                   mp[0], mp[1]):
         but_tex = gui.GUI_TEXTURES["button_bg_hover"]
         if mc == 1:
+            menuChannelSound.stop()
             IN_MENU = False
             PAUSE = False
 
     but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2))
     drawInfoLabel("Singleplayer", xx=WIDTH // 2, yy=HEIGHT // 2 - (but_tex.height // 2) + 14, style=[('', '')],
                   size=12, anchor_x='center')
+    #
+
+    # Quit button
+    but_tex = gui.GUI_TEXTURES["button_bg"]
+    if checkHover(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2) + 50,
+                  but_tex.width, but_tex.height,
+                  mp[0], mp[1]):
+        but_tex = gui.GUI_TEXTURES["button_bg_hover"]
+        if mc == 1:
+            exit()
+
+    but_tex.blit(WIDTH // 2 - (but_tex.width // 2), HEIGHT // 2 - (but_tex.height // 2) - 50)
+    drawInfoLabel("Quit game", xx=WIDTH // 2, yy=HEIGHT // 2 - (but_tex.height // 2) + 14 - 50, style=[('', '')],
+                  size=12, anchor_x='center')
+    #
 
     pygame.display.flip()
     clock.tick(MAX_FPS)
@@ -66,10 +84,10 @@ def drawMainMenu(mc):
         mainMenuRotation[2] = True
 
     if mainMenuRotation[2]:
-        mainMenuRotation[0] -= 0.02
+        mainMenuRotation[0] -= 0.008
     else:
-        mainMenuRotation[0] += 0.02
-    mainMenuRotation[1] += 0.04
+        mainMenuRotation[0] += 0.008
+    mainMenuRotation[1] += 0.02
 
 
 print("Loading the game...")
@@ -211,6 +229,19 @@ texture.height *= 2
 gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
+
+menuChannelSound = pygame.mixer.music
+menuSound = ["sounds/music/10.mp3", "sounds/music/11.mp3", "sounds/music/12.mp3", "sounds/music/13.mp3"]
+musicNum = randint(0, len(menuSound) - 1)
+menuChannelSound.load(menuSound[musicNum])
+for i in range(len(menuSound)):
+    if i == musicNum:
+        continue
+    menuChannelSound.queue(menuSound[i])
+menuChannelSound.play()
+menuChannelSound.queue(menuSound[i])
+menuChannelSound.set_volume(sound.volume)
+
 print("Loading complete!")
 mainMenuRotation = [50, 180, True]
 
@@ -225,6 +256,24 @@ while True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     PAUSE = not PAUSE
+                if event.key == pygame.K_1:
+                    player.inventory.activeInventory = 0
+                if event.key == pygame.K_2:
+                    player.inventory.activeInventory = 1
+                if event.key == pygame.K_3:
+                    player.inventory.activeInventory = 2
+                if event.key == pygame.K_4:
+                    player.inventory.activeInventory = 3
+                if event.key == pygame.K_5:
+                    player.inventory.activeInventory = 4
+                if event.key == pygame.K_6:
+                    player.inventory.activeInventory = 5
+                if event.key == pygame.K_7:
+                    player.inventory.activeInventory = 6
+                if event.key == pygame.K_8:
+                    player.inventory.activeInventory = 7
+                if event.key == pygame.K_9:
+                    player.inventory.activeInventory = 8
                 if event.key == pygame.K_F3:
                     showInfoLabel = not showInfoLabel
                 if event.key == pygame.K_F5:

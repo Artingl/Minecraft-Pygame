@@ -6,7 +6,6 @@ from pyglet.gl import *
 from game.entity.Inventory import Inventory
 from game.Particles import Particles
 from game.entity.Zombie import Zombie
-from game.models.OBJLoader import OBJLoader
 from game.world.worldGenerator import worldGenerator
 from openGL.CubeHandler import CubeHandler
 from settings import *
@@ -22,7 +21,6 @@ class Scene:
         self.drawCounter = 0
         self.in_water = False
         self.worldGen = worldGenerator(self, randint(434, 434343454))
-        self.obj = OBJLoader()
         self.particles = Particles(self)
         self.gui = None
         self.sound = None
@@ -77,17 +75,16 @@ class Scene:
         self.loadPanoramaTextures()
         self.vertexList()
 
-        self.obj.loadModels()
         self.transparent = pyglet.graphics.Batch()
         self.opaque = pyglet.graphics.Batch()
-        self.particleBatch = pyglet.graphics.Batch()
+        self.stuffBatch = pyglet.graphics.Batch()
         self.player.inventory = Inventory(self)
         self.cubes = CubeHandler(self.opaque, self.block, self.opaque,
                                  ('leaves_taiga', 'leaves_oak', 'tall_grass', 'nocolor'), self)
 
-        self.zombie = Zombie()
-        self.zombie.position = [0, 60, 0]
-        # self.entity.append(self.zombie)
+        self.zombie = Zombie(self)
+        self.zombie.position = [0, 53, 0]
+        self.entity.append(self.zombie)
 
         self.set3d()
 
@@ -120,21 +117,21 @@ class Scene:
 
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
         mode = GL_QUADS
-        self.particleBatch.add(4, mode, self.panorama[2], ('v3f', vertexes[0]),
-                               tex_coords)  # back
-        self.particleBatch.add(4, mode, self.panorama[0], ('v3f', vertexes[1]),
-                               tex_coords)  # front
+        self.stuffBatch.add(4, mode, self.panorama[2], ('v3f', vertexes[0]),
+                            tex_coords)  # back
+        self.stuffBatch.add(4, mode, self.panorama[0], ('v3f', vertexes[1]),
+                            tex_coords)  # front
 
-        self.particleBatch.add(4, mode, self.panorama[3], ('v3f', vertexes[2]),
-                               tex_coords)  # left
-        self.particleBatch.add(4, mode, self.panorama[1], ('v3f', vertexes[3]),
-                               tex_coords)  # right
+        self.stuffBatch.add(4, mode, self.panorama[3], ('v3f', vertexes[2]),
+                            tex_coords)  # left
+        self.stuffBatch.add(4, mode, self.panorama[1], ('v3f', vertexes[3]),
+                            tex_coords)  # right
 
-        self.particleBatch.add(4, mode, self.panorama[5], ('v3f', vertexes[4]),
-                               tex_coords)  # bottom
+        self.stuffBatch.add(4, mode, self.panorama[5], ('v3f', vertexes[4]),
+                            tex_coords)  # bottom
 
-        self.particleBatch.add(4, mode, self.panorama[4], ('v3f', vertexes[5]),
-                               tex_coords)  # top
+        self.stuffBatch.add(4, mode, self.panorama[4], ('v3f', vertexes[5]),
+                            tex_coords)  # top
 
     def updateScene(self):
         # self.time += 1 * clock.get_fps() / 1000
@@ -196,5 +193,5 @@ class Scene:
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
         self.transparent.draw()
 
-        self.particleBatch.draw()
-        self.particleBatch = pyglet.graphics.Batch()
+        self.stuffBatch.draw()
+        self.stuffBatch = pyglet.graphics.Batch()

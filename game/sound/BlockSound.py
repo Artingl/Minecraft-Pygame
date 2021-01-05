@@ -34,7 +34,7 @@ class BlockSound:
             sound = self.gl.sound.SOUNDS["damage"]["hit"][randint(0, bl - 1)]
 
         chnl = sound.play()
-        chnl.set_volume(0.6)
+        chnl.set_volume(self.gl.sound.volume)
 
     def playStepSound(self, blockName):
         self.cntr += 1
@@ -44,16 +44,16 @@ class BlockSound:
 
         bl = len(self.gl.sound.BLOCKS_SOUND["step"][blName])
         chnl = self.gl.sound.BLOCKS_SOUND["step"][blName][randint(0, bl - 1)].play()
-        chnl.set_volume(0.3)
+        chnl.set_volume(self.gl.sound.volume)
 
     def playBoomSound(self):
         bl = len(self.gl.sound.BLOCKS_SOUND["explode"])
         chnl = self.gl.sound.BLOCKS_SOUND["explode"][randint(0, bl - 1)].play()
-        chnl.set_volume(0.3)
+        chnl.set_volume(self.gl.sound.volume)
 
     def playBlockSound(self, blockName):
         blName = self.getBlockSound(blockName)
 
         bl = len(self.gl.sound.BLOCKS_SOUND["dig"][blName])
         chnl = self.gl.sound.BLOCKS_SOUND["dig"][blName][randint(0, bl - 1)].play()
-        chnl.set_volume(0.3)
+        chnl.set_volume(self.gl.sound.volume)
