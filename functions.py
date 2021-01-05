@@ -1,8 +1,8 @@
 import os
+import time
 from random import randint
-
 import pyglet
-from OpenGL.raw.GL.VERSION.GL_1_0 import glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST
+from OpenGL.GL import *
 from settings import *
 
 
@@ -93,19 +93,20 @@ def spiral(n):
     x, y = 0, 0
     arr = [[None] * n for _ in range(n)]
     arr1 = {}
-    for i in range(1, n**2+1):
+    for i in range(1, n ** 2 + 1):
         arr[x][y] = i
         arr1[i] = (x, y)
-        nx, ny = x+dx, y+dy
+        nx, ny = x + dx, y + dy
         if 0 <= nx < n and 0 <= ny < n and not arr[nx][ny]:
             x, y = nx, ny
         else:
             dx, dy = -dy, dx
-            x, y = x+dx, y+dy
+            x, y = x + dx, y + dy
     return arr1
 
 
-def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1):
+def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1, rotate=0,
+                  label_color=(255, 255, 255), shadow_color=(56, 56, 56), scale=0):
     if style is None:
         style = []
     y = -21
@@ -118,14 +119,14 @@ def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor
             iy = yy - 2
         shadow_lbl = pyglet.text.Label(i,
                                        font_name='Minecraft Rus',
-                                       color=(63, 63, 63, round(opacity * 255)),
+                                       color=(shadow_color[0], shadow_color[1], shadow_color[2], round(opacity * 255)),
                                        font_size=size,
                                        x=ix, y=iy,
                                        anchor_x=anchor_x,
                                        anchor_y=anchor_y)
         lbl = pyglet.text.Label(i,
                                 font_name='Minecraft Rus',
-                                color=(255, 255, 255, round(opacity * 255)),
+                                color=(label_color[0], label_color[1], label_color[2], round(opacity * 255)),
                                 font_size=size,
                                 x=ix - 2, y=iy + 2,
                                 anchor_x=anchor_x,
@@ -136,9 +137,21 @@ def drawInfoLabel(text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor
             for st in style:
                 lbl.set_style(st[0], st[1])
                 shadow_lbl.set_style(st[0], st[1])
+        if rotate:
+            glRotatef(rotate, 0.0, 0.0, 1.0)
+        if scale:
+            glScalef(scale, scale, 0)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         shadow_lbl.draw()
         lbl.draw()
+        if rotate:
+            glRotatef(-rotate, 0.0, 0.0, 1.0)
         y -= 21
+
+
+def getElpsTime():
+    return time.perf_counter_ns() * 1000 / 1000000000
 
 
 def checkHover(ox, oy, ow, oh, mx, my):

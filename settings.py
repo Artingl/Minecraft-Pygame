@@ -1,3 +1,5 @@
+import timeit
+
 import pygame
 from pyglet import font
 

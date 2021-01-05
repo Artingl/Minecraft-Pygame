@@ -1,7 +1,10 @@
+import math
 import os
+import time
+import timeit
 from random import randint
 
-from functions import drawInfoLabel
+from functions import drawInfoLabel, getElpsTime
 from game.GUI.Button import Button
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
@@ -38,11 +41,11 @@ def genWorld(mbclicked):
                 tex2.blit(ix, iy)
 
     scene.genWorld()
-    if len(scene.worldSp) - scene.chunkg > 120:
+    if len(scene.worldSp) - scene.chunkg > 220:
         IN_MENU = False
         PAUSE = False
 
-    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 120)
+    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 220)
     drawInfoLabel("Loading world...", xx=WIDTH // 2, yy=HEIGHT // 2, style=[('', '')], size=14, anchor_x='center')
     drawInfoLabel(f"Generating terrain {proc}%...", xx=WIDTH // 2, yy=HEIGHT // 2 - 39,
                   style=[('', '')], size=12, anchor_x='center')
@@ -52,7 +55,7 @@ def genWorld(mbclicked):
 
 
 def drawMainMenu(mc):
-    global mainMenuRotation, IN_MENU, PAUSE
+    global mainMenuRotation, IN_MENU, PAUSE, splashSize
     glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.7, 1, 1))
     glFogf(GL_FOG_START, 60)
     glFogf(GL_FOG_END, 120)
@@ -73,10 +76,10 @@ def drawMainMenu(mc):
     scene.set2d()
     mp = pygame.mouse.get_pos()
 
-    drawInfoLabel("Minecraft 1.5.2", xx=10, yy=10, style=[('', '')], size=12)
-
     tex = gui.GUI_TEXTURES["game_logo"]
     tex.blit(WIDTH // 2 - (tex.width // 2), HEIGHT - tex.height - (HEIGHT // 15))
+
+    drawInfoLabel("Minecraft 1.5.2", xx=10, yy=10, style=[('', '')], size=12)
 
     # Singleplayer button
     singleplayerButton.x = WIDTH // 2 - (singleplayerButton.button.width // 2)
@@ -89,6 +92,15 @@ def drawMainMenu(mc):
     quitButton.y = HEIGHT // 2 - (quitButton.button.height // 2) + 25
     quitButton.update(mp, mc)
     #
+
+    glPushMatrix()
+    glTranslatef((WIDTH // 2 + (tex.width // 2)) - 40, HEIGHT - tex.height - (HEIGHT // 15) + 30, 0.0)
+    glRotatef(20.0, 0.0, 0.0, 1.0)
+    var8 = 1.8 - abs(math.sin((getElpsTime() % 1000) / 1000.0 * math.pi * 2.0) * 0.1)
+    var8 = var8 * 100.0 / ((24 * 12) + 32)
+    drawInfoLabel(splash, xx=1, yy=1, style=[('', '')], scale=var8, size=20, anchor_x='center',
+                  label_color=(255, 255, 0), shadow_color=(63, 63, 0))
+    glPopMatrix()
 
     pygame.display.flip()
     clock.tick(MAX_FPS)
@@ -218,7 +230,6 @@ gui.GUI_TEXTURES = {
     "black": pyglet.resource.image("gui/gui_elements/black.png"),
 }
 
-
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 texture = gui.GUI_TEXTURES["inventory"]
 texture.width *= 2
@@ -268,6 +279,12 @@ gui.addGuiElement("crosshair", (WIDTH // 2 - 9, HEIGHT // 2 - 9))
 
 showInfoLabel = False
 
+print("Loading splashes...")
+splfile = open("gui/splashes.txt", "r")
+splash = splfile.read().split("\n")
+splash = splash[randint(0, len(splash) - 1)]
+splfile.close()
+
 menuChannelSound = pygame.mixer.music
 menuSound = ["sounds/music/10.mp3", "sounds/music/11.mp3", "sounds/music/12.mp3", "sounds/music/13.mp3"]
 musicNum = randint(0, len(menuSound) - 1)
@@ -293,6 +310,7 @@ mainFunction = drawMainMenu
 
 while True:
     mbclicked = None
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
@@ -344,21 +362,20 @@ while True:
     if IN_MENU:
         mainFunction(mbclicked)
 
-    if PAUSE:
-        continue
-    sound.playMusic()
+    if not PAUSE:
+        sound.playMusic()
 
-    pygame.mouse.set_pos((WIDTH // 2, HEIGHT // 2))
-    scene.updateScene()
+        pygame.mouse.set_pos((WIDTH // 2, HEIGHT // 2))
+        scene.updateScene()
 
-    player.inventory.draw()
-    gui.update()
+        player.inventory.draw()
+        gui.update()
 
-    if showInfoLabel:
-        drawInfoLabel(f"FPS: {round(clock.get_fps())}\n"
-                      f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}\n"
-                      f"World seed: {scene.worldGen.seed}\n"
-                      f"Count of particles: {len(scene.particles.particles)}\n"
-                      f"Chunks: {scene.chunkg}")
-    pygame.display.flip()
-    clock.tick(MAX_FPS)
+        if showInfoLabel:
+            drawInfoLabel(f"FPS: {round(clock.get_fps())}\n"
+                          f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}\n"
+                          f"World seed: {scene.worldGen.seed}\n"
+                          f"Count of particles: {len(scene.particles.particles)}\n"
+                          f"Chunks: {scene.chunkg}")
+        pygame.display.flip()
+        clock.tick(MAX_FPS)
