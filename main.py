@@ -31,11 +31,9 @@ def quitToMenu():
     IN_MENU = True
 
     scene.resetScene()
-
-    print("Loading the game...")
-    player.position = [0, -90, 0]
-
     scene.initScene()
+
+    player.position = [0, -90, 0]
     mainFunction = drawMainMenu
 
 
@@ -111,7 +109,7 @@ def genWorld(mc):
 
     proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 1)#220)
     drawInfoLabel(scene, "Loading world...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2, style=[('', '')],
-                  size=14, anchor_x='center')
+                  size=12, anchor_x='center')
     drawInfoLabel(scene, f"Generating terrain {proc}%...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2 - 39,
                   style=[('', '')], size=12, anchor_x='center')
 
@@ -122,8 +120,8 @@ def genWorld(mc):
 def drawMainMenu(mc):
     global mainMenuRotation, IN_MENU, PAUSE
     glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.7, 1, 1))
-    glFogf(GL_FOG_START, 60)
-    glFogf(GL_FOG_END, 120)
+    glFogf(GL_FOG_START, 0)
+    glFogf(GL_FOG_END, 1000)
 
     scene.set3d()
 

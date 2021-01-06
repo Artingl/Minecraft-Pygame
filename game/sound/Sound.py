@@ -15,7 +15,7 @@ class Sound:
         self.menuChannelSound = pygame.mixer.music
         self.musicPlayer = pygame.mixer.music
 
-        self.volume = 0.1
+        self.volume = 0.3
 
     def initMusic(self):
         musicNum = randint(0, len(self.MUSIC) - 1)
