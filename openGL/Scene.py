@@ -6,6 +6,7 @@ from pyglet.gl import *
 from functions import *
 from game.Particles import Particles
 from game.blocks.DestroyBlock import DestroyBlock
+from game.blocks.droppedBlock import droppedBlock
 from game.entity.Inventory import Inventory
 from game.entity.Zombie import Zombie
 from game.world.Clouds import Clouds
@@ -51,6 +52,7 @@ class Scene:
         self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
         self.chunkg = len(self.worldSp)
         self.clouds = Clouds(self)
+        self.droppedBlock = droppedBlock(self)
         self.worldGen = worldGenerator(self, randint(434, 434343454))
         self.particles = Particles(self)
         self.destroy = DestroyBlock(self)
@@ -201,6 +203,7 @@ class Scene:
         self.draw()
 
         self.clouds.update()
+        self.droppedBlock.update()
 
         for i in self.entity:
             i.update()

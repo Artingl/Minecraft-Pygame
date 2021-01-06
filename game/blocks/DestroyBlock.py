@@ -68,7 +68,7 @@ class DestroyBlock:
         if self.destroyStage > 9:
             self.destroyStage = -1
             if blockByVec[0] in self.gl.cubes.cubes:
-                self.gl.player.inventory.addBlock(self.gl.cubes.cubes[blockByVec[0]].name)
+                self.gl.droppedBlock.addBlock(blockByVec[0], self.gl.cubes.cubes[blockByVec[0]].name)
 
             self.gl.blockSound.playBlockSound(self.gl.cubes.cubes[blockByVec[0]].name)
             self.gl.particles.addParticle(self.gl.cubes.cubes[blockByVec[0]].p, self.gl.cubes.cubes[blockByVec[0]],

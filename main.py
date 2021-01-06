@@ -30,6 +30,11 @@ def quitToMenu():
     PAUSE = True
     IN_MENU = True
 
+    sound.initMusic(False)
+
+    sound.musicPlayer.play()
+    sound.musicPlayer.set_volume(sound.volume)
+
     scene.resetScene()
     scene.initScene()
 
@@ -44,7 +49,8 @@ def showSettings():
 
 def startNewGame():
     global mainFunction
-    sound.menuChannelSound.stop()
+    sound.musicPlayer.stop()
+    sound.initMusic(True)
     mainFunction = genWorld
 
 
@@ -224,6 +230,7 @@ pygame.display.flip()
 #
 
 print("Loading sounds...")
+sound.BLOCKS_SOUND["pickUp"] = pygame.mixer.Sound("sounds/pick.mp3")
 
 print("Loading step sounds...")
 sound.BLOCKS_SOUND["step"] = {}
@@ -291,7 +298,7 @@ print("Loading game music...")
 for e, i in enumerate(os.listdir("sounds/music/game")):
     sound.MUSIC.append("sounds/music/game/" + i)
     print("Successful loaded", i, "music!")
-sound.initMusic()
+sound.initMusic(False)
 
 print("Music loaded successful!")
 
@@ -384,8 +391,8 @@ splash = splfile.read().split("\n")
 splash = splash[randint(0, len(splash) - 1)]
 splfile.close()
 
-sound.menuChannelSound.play()
-sound.menuChannelSound.set_volume(sound.volume)
+sound.musicPlayer.play()
+sound.musicPlayer.set_volume(sound.volume)
 
 # Main menu buttons
 singleplayerButton = Button(scene, "Singleplayer", 0, 0)

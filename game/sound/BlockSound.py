@@ -57,3 +57,7 @@ class BlockSound:
         bl = len(self.gl.sound.BLOCKS_SOUND["dig"][blName])
         chnl = self.gl.sound.BLOCKS_SOUND["dig"][blName][randint(0, bl - 1)].play()
         chnl.set_volume(self.gl.sound.volume)
+
+    def playPickUpSound(self):
+        chnl = self.gl.sound.BLOCKS_SOUND["pickUp"].play()
+        chnl.set_volume(self.gl.sound.volume)
