@@ -14,10 +14,11 @@ class Sound:
 
         self.musicPlayer = pygame.mixer.music
 
-        self.volume = 0.3
+        self.volume = 1
 
     def initMusic(self, t):
         self.musicPlayer.stop()
+        del self.musicPlayer
         self.musicPlayer = pygame.mixer.music
 
         if t:
@@ -47,7 +48,7 @@ class Sound:
     def playMusic(self):
         if self.music_already_playing:
             return
-        if True:#randint(0, 5000) == 746:
+        if randint(0, 5000) == 746:
             self.music_already_playing = True
             self.musicPlayer.play(0, 0.1)
             self.musicPlayer.set_volume(self.volume)
