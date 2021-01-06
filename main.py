@@ -387,8 +387,6 @@ while True:
                         if player.cameraType > 3:
                             player.cameraType = 1
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    player.mouseEvent(event.button)
-                if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 4:
                         player.inventory.activeInventory -= 1
                         if player.inventory.activeInventory < 0:
@@ -409,12 +407,13 @@ while True:
 
     if not PAUSE:
         sound.playMusic()
+        player.mouseEvent(pygame.mouse.get_pressed(3))
 
         if scene.allowEvents["showCrosshair"]:
             gui.shows["crosshair"][1] = (scene.WIDTH // 2 - 9, scene.HEIGHT // 2 - 9)
         else:
             gui.shows["crosshair"][1] = (-100, -100)
-        if scene.allowEvents["grabMouse"]:
+        if scene.allowEvents["grabMouse"] and pygame.mouse.get_focused():
             pygame.mouse.set_pos((scene.WIDTH // 2, scene.HEIGHT // 2))
         scene.updateScene()
 

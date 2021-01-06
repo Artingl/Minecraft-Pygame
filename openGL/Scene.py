@@ -5,6 +5,7 @@ from pyglet.gl import *
 
 from functions import *
 from game.Particles import Particles
+from game.blocks.DestroyBlock import DestroyBlock
 from game.entity.Inventory import Inventory
 from game.entity.Zombie import Zombie
 from game.world.worldGenerator import worldGenerator
@@ -29,6 +30,7 @@ class Scene:
         self.in_water = False
         self.worldGen = worldGenerator(self, randint(434, 434343454))
         self.particles = Particles(self)
+        self.destroy = DestroyBlock(self)
         self.gui = None
         self.sound = None
         self.blockSound = None
@@ -197,6 +199,8 @@ class Scene:
 
         blockByVec = self.cubes.hitTest(self.player.position, self.player.get_sight_vector())
         if blockByVec[0]:
+            self.destroy.drawDestroy(*blockByVec[0])
+
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
             glColor3d(0, 0, 0)
             pyglet.graphics.draw(24, GL_QUADS, ('v3f/static', flatten(cube_vertices(blockByVec[0], 0.51))))

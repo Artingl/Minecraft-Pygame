@@ -17,7 +17,7 @@ def load_textures(self):
             if os.path.isdir(d + '/' + file):
                 dirs += [d + '/' + file]
             else:
-                if ".png" not in file:
+                if ".png" not in file or d == "textures/blocks/block_destroy":
                     continue
 
                 n = file.split('.')[0]

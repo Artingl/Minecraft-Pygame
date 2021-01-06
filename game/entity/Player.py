@@ -1,9 +1,11 @@
 import math
 
+import pyglet
 from OpenGL.GL import *
 
 from game.blocks.BlockEvent import *
-from functions import roundPos
+from functions import roundPos, flatten, cube_vertices
+from game.blocks.DestroyBlock import DestroyBlock
 from settings import *
 
 
@@ -12,10 +14,9 @@ class Player:
         print("Init Player class...")
 
         self.position, self.rotation = [x, y, z], rotation
-        self.speed = 0.02
+        self.speed = 0.03
         self.gl = gl
-        self.gravity = 3.8
-        self.jSpeed = (4 * self.gravity) ** .46
+        self.gravity = 5.8
         self.tVel = 50
         self.dy = 0
         self.shift = 0
@@ -68,8 +69,8 @@ class Player:
             DX, DY, DZ = 0, 0, 0
 
             rotY = self.rotation[1] / 180 * math.pi
-            dx, dz = (self.speed + self.acceleration + 0.01) * math.sin(rotY), \
-                     (self.speed + self.acceleration + 0.01) * math.cos(rotY)
+            dx, dz = (self.speed + self.acceleration - 0.008) * math.sin(rotY), \
+                     (self.speed + self.acceleration - 0.008) * math.cos(rotY)
 
             key = pygame.key.get_pressed()
             if key[pygame.K_LCTRL]:
@@ -128,15 +129,15 @@ class Player:
 
     def jump(self):
         if not self.dy:
-            self.dy = self.jSpeed * 0.9
+            self.dy = 4
 
     def move(self, dt, dx, dy, dz):
         self.dy -= dt * self.gravity
         self.dy = max(self.dy, -self.tVel)
         dy += self.dy * dt
 
-        if self.dy > 9.8:
-            self.dy = 9.8
+        if self.dy > 19.8:
+            self.dy = 19.8
 
         x, y, z = self.position
         col = self.collide((x + dx, y + dy, z + dz))
@@ -201,23 +202,15 @@ class Player:
     def mouseEvent(self, button):
         blockByVec = self.gl.cubes.hitTest(self.position, self.get_sight_vector())
 
-        if button == 1 and blockByVec[0]:
-            if blockByVec[0] in self.gl.cubes.cubes:
-                if self.inventory.inventory[self.inventory.activeInventory][0] == \
-                        self.gl.cubes.cubes[blockByVec[0]].name:
-                    self.inventory.inventory[self.inventory.activeInventory][1] += 1
-                elif self.inventory.inventory[self.inventory.activeInventory][1] == 0:
-                    self.inventory.inventory[self.inventory.activeInventory][1] += 1
-                    self.inventory.inventory[self.inventory.activeInventory][0] = \
-                        self.gl.cubes.cubes[blockByVec[0]].name
-            self.gl.blockSound.playBlockSound(self.gl.cubes.cubes[blockByVec[0]].name)
-            self.gl.particles.addParticle(self.gl.cubes.cubes[blockByVec[0]].p, self.gl.cubes.cubes[blockByVec[0]],
-                                          direction="down")
-            self.gl.cubes.remove(blockByVec[0])
-        if button == 2 and blockByVec[0]:
+        if button[0] and blockByVec[0]:
+            self.gl.destroy.destroy(self.gl.cubes.cubes[blockByVec[0]].name, blockByVec)
+        else:
+            self.gl.destroy.destroyStage = -1
+
+        if button[1] and blockByVec[0]:
             self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
             self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
-        if button == 3:
+        if button[2]:
             if blockByVec[0] and self.shift <= 0:
                 if blockByVec[0] in self.gl.cubes.cubes:
                     if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[0]], self.gl):
