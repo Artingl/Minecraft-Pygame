@@ -1,4 +1,5 @@
 import math
+from random import randint
 
 import pyglet
 from OpenGL.GL import *
@@ -160,10 +161,10 @@ class Player:
         #
         if not self.bInAir:
             for i in range(1, 6):
-                col2 = roundPos((col[0], col[1] - i, col[2]))
-                if col2 not in self.gl.cubes.cubes:
+                col21 = roundPos((col[0], col[1] - i, col[2]))
+                if col21 not in self.gl.cubes.cubes:
                     self.bInAir = True
-                    if self.playerFallY < col2[1]:
+                    if self.playerFallY < col[1]:
                         self.playerFallY = round(col[1] - self.lastPlayerPosOnGround[1])
                 else:
                     self.bInAir = False
@@ -190,7 +191,13 @@ class Player:
             self.hp = hp
             if self.hp <= 0:
                 # Player dead
-                self.hp = 20
+                self.gl.deathScreen()
+                for i in self.inventory.inventory.items():
+                    for j in range(i[1][1]):
+                        self.gl.droppedBlock.addBlock((
+                            self.position[0] + randint(-2, 2), self.position[1], self.position[2] + randint(-2, 2)
+                        ), i[1][0])
+                    self.inventory.inventory[i[0]] = [i[1][0], 0]
 
             self.bInAir = False
             self.gl.particles.addParticle((col[0], col[1] - 1, col[2]),
@@ -235,6 +242,7 @@ class Player:
     def collide(self, pos):
         if pos[1] < -80:
             self.dy = 0
+            self.lastPlayerPosOnGround = self.gl.startPlayerPos
             return self.gl.startPlayerPos
 
         p = list(pos)

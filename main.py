@@ -13,6 +13,12 @@ from openGL.Scene import Scene
 from settings import *
 
 
+def respawn():
+    pause()
+    player.hp = 20
+    player.position = scene.startPlayerPos
+
+
 def quitToMenu():
     global PAUSE, IN_MENU, mainFunction
 
@@ -55,10 +61,47 @@ def startNewGame():
 
 
 def pause():
-    global PAUSE
+    global PAUSE, mainFunction
     PAUSE = not PAUSE
     scene.allowEvents["movePlayer"] = True
     scene.allowEvents["keyboardAndMouse"] = True
+    mainFunction = pauseMenu
+
+
+def deathScreen():
+    global PAUSE, mainFunction
+    PAUSE = not PAUSE
+    scene.allowEvents["movePlayer"] = True
+    scene.allowEvents["keyboardAndMouse"] = True
+    mainFunction = drawDeathScreen
+
+
+def drawDeathScreen(mc):
+    bg = gui.GUI_TEXTURES["red"]
+    bg.width = scene.WIDTH
+    bg.height = scene.HEIGHT
+    bg.blit(0, 0)
+
+    mp = pygame.mouse.get_pos()
+
+    drawInfoLabel(scene, f"You died!", xx=scene.WIDTH // 2, yy=scene.HEIGHT - scene.HEIGHT // 4, style=[('', '')],
+                  size=34, anchor_x='center')
+
+    # Back to Game button
+    respawnButton.x = scene.WIDTH // 2 - (respawnButton.button.width // 2)
+    respawnButton.y = scene.HEIGHT // 2 - (respawnButton.button.height // 2) - 50
+    respawnButton.update(mp, mc)
+    #
+
+    # Quit to main menu button
+    quitWorldButton.text = "Title screen"
+    quitWorldButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
+    quitWorldButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2)
+    quitWorldButton.update(mp, mc)
+    #
+
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
 
 
 def pauseMenu(mc):
@@ -79,6 +122,7 @@ def pauseMenu(mc):
     #
 
     # Quit to main menu button
+    quitWorldButton.text = "Quit to main menu"
     quitWorldButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
     quitWorldButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2)
     quitWorldButton.update(mp, mc)
@@ -109,11 +153,11 @@ def genWorld(mc):
                 tex2.blit(ix, iy)
 
     scene.genWorld()
-    if len(scene.worldSp) - scene.chunkg > 1:#220:
+    if len(scene.worldSp) - scene.chunkg > 1:#1220:
         IN_MENU = False
         PAUSE = False
 
-    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 1)#220)
+    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 1)#1220)
     drawInfoLabel(scene, "Loading world...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2, style=[('', '')],
                   size=12, anchor_x='center')
     drawInfoLabel(scene, f"Generating terrain {proc}%...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2 - 39,
@@ -215,6 +259,8 @@ scene.blockSound = blockSound
 scene.gui = gui
 scene.sound = sound
 scene.player = player
+
+scene.deathScreen = deathScreen
 scene.initScene()
 
 # Loading screen
@@ -318,6 +364,7 @@ gui.GUI_TEXTURES = {
     "edit_bg": pyglet.resource.image("gui/gui_elements/edit_bg.png"),
     "options_background": pyglet.resource.image("gui/gui_elements/options_background.png"),
     "black": pyglet.resource.image("gui/gui_elements/black.png"),
+    "red": pyglet.resource.image("gui/gui_elements/red.png"),
     "selected": pyglet.resource.image("gui/gui_elements/selected.png"),
 }
 
@@ -375,6 +422,10 @@ texture = gui.GUI_TEXTURES["black"]
 texture.width *= 6
 texture.height *= 6
 
+texture = gui.GUI_TEXTURES["red"]
+texture.width *= 6
+texture.height *= 6
+
 texture = gui.GUI_TEXTURES["selected"]
 texture.width *= 2
 texture.height *= 2
@@ -410,6 +461,11 @@ quitWorldButton = Button(scene, "Quit to main menu", 0, 0)
 
 resumeButton.setEvent(pause)
 quitWorldButton.setEvent(quitToMenu)
+#
+
+# Death screen buttons
+respawnButton = Button(scene, "Respawn", 0, 0)
+respawnButton.setEvent(respawn)
 #
 
 print("Loading complete!")
@@ -544,4 +600,4 @@ while True:
         player.inventory.draw()
         gui.update()
 
-        pauseMenu(mbclicked)
+        mainFunction(mbclicked)

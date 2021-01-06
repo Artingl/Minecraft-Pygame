@@ -110,13 +110,14 @@ def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', an
     if style is None:
         style = []
     y = -21
+    ms = size / 6
     for i in text.split("\n"):
-        ix = 2
-        iy = gl.HEIGHT + y + yy - 2
+        ix = ms
+        iy = gl.HEIGHT + y + yy - ms
         if xx:
-            ix = xx + 2
+            ix = xx + ms
         if yy:
-            iy = yy - 2
+            iy = yy - ms
         shadow_lbl = pyglet.text.Label(i,
                                        font_name='Minecraft Rus',
                                        color=(shadow_color[0], shadow_color[1], shadow_color[2], round(opacity * 255)),
@@ -128,7 +129,7 @@ def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', an
                                 font_name='Minecraft Rus',
                                 color=(label_color[0], label_color[1], label_color[2], round(opacity * 255)),
                                 font_size=size,
-                                x=ix - 2, y=iy + 2,
+                                x=ix - ms, y=iy + ms,
                                 anchor_x=anchor_x,
                                 anchor_y=anchor_y)
         if not style:

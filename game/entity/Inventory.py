@@ -21,7 +21,7 @@ class Inventory:
         old = False
         for i in range(10):
             old = not old
-            self.heartAnimation.append([0, '-' if old else '+'])
+            self.heartAnimation.append([0, '-' if old else '+', randint(3, 8) / 10])
         for i in range(9 * 4 + 1):
             block = ls[i][0]
 
@@ -153,16 +153,16 @@ class Inventory:
 
         for i in range(10):
             ay = 0
-            if self.gl.player.hp <= 3:
+            if self.gl.player.hp <= 6:
                 ay = self.heartAnimation[i][0]
                 if self.heartAnimation[i][1] == "-":
-                    self.heartAnimation[i][0] -= 0.7
+                    self.heartAnimation[i][0] -= self.heartAnimation[i][2]
                 else:
-                    self.heartAnimation[i][0] += 0.7
+                    self.heartAnimation[i][0] += self.heartAnimation[i][2]
 
-                if self.heartAnimation[i][0] > 2:
+                if self.heartAnimation[i][0] > 1:
                     self.heartAnimation[i][1] = "-"
-                elif self.heartAnimation[i][0] < -2:
+                elif self.heartAnimation[i][0] < -1:
                     self.heartAnimation[i][1] = "+"
 
             heartbg.blit((self.gl.WIDTH // 2 - (inventory.width // 2)) + ((heartbg.width - 1) * i),
@@ -173,7 +173,7 @@ class Inventory:
         x = (self.gl.WIDTH // 2 - (inventory.width // 2)) + 2
         for i in range(self.gl.player.hp):
             ay = 0
-            if self.gl.player.hp <= 3:
+            if self.gl.player.hp <= 6:
                 ay = self.heartAnimation[ch][0]
 
             if cntr == 0:

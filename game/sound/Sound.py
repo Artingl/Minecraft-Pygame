@@ -50,5 +50,5 @@ class Sound:
             return
         if randint(0, 5000) == 746:
             self.music_already_playing = True
-            self.musicPlayer.play(0, 0.1)
+            self.musicPlayer.play()
             self.musicPlayer.set_volume(self.volume)

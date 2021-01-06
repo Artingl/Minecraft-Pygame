@@ -23,6 +23,7 @@ class Scene:
         self.gui = None
         self.sound = None
         self.blockSound = None
+        self.deathScreen = None
         self.player = None
 
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
