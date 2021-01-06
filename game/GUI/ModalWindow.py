@@ -59,7 +59,7 @@ class ModalWindow:
             self.cellPositions[bid + 9][1] = self.gl.player.inventory.inventory[bid]
             inv = self.gl.player.inventory.inventory[bid]
 
-            if inv[1] == 0:
+            if inv[1] == 0 or inv[0] == 0:
                 continue
             self.gl.inventory_textures[inv[0]].blit((self.gl.WIDTH // 2 - (win.width // 2)) + xx + 5,
                                                     (self.gl.HEIGHT // 2 + (win.height // 2)) - yy + by - 27)

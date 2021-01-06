@@ -9,7 +9,10 @@ class Sound:
         self.BLOCKS_SOUND = {}
         self.SOUNDS = {}
         self.MUSIC = []
+        self.MENU_MUSIC = []
         self.music_already_playing = False
+
+        self.menuChannelSound = pygame.mixer.music
         self.musicPlayer = pygame.mixer.music
 
         self.volume = 0.1
@@ -21,6 +24,13 @@ class Sound:
             if i == musicNum:
                 continue
             self.musicPlayer.queue(self.MUSIC[i])
+
+        musicNum = randint(0, len(self.MENU_MUSIC) - 1)
+        self.menuChannelSound.load(self.MENU_MUSIC[musicNum])
+        for i in range(len(self.MENU_MUSIC)):
+            if i == musicNum:
+                continue
+            self.menuChannelSound.queue(self.MENU_MUSIC[i])
 
     def playSound(self, name, volume):
         channel = self.SOUNDS[name].play()

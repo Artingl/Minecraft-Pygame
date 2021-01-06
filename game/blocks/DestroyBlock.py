@@ -9,6 +9,7 @@ class DestroyBlock:
         self.gl = gl
         self.destroyStage = -1
         self.textures = {}
+        self.destroyPos = [0, 0, 0]
 
         self.loadTextures()
 
@@ -20,14 +21,12 @@ class DestroyBlock:
                                              .get_mipmapped_texture())
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
-    def drawDestroy(self, x, y, z):
+    def drawDestroy(self, ox, oy, oz):
         if self.destroyStage == -1:
             return
 
         s = 1.01
-        x += s / 2
-        y += s / 2
-        z += s / 2
+        x, y, z = ox + s / 2, oy + s / 2, oz + s / 2
         X, Y, Z = x - s, y - s, z - s
 
         vertexes = [
@@ -41,6 +40,10 @@ class DestroyBlock:
 
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
         mode = GL_QUADS
+        if int(self.destroyStage) % 5 == 0:
+            if (ox, oy, oz) in self.gl.cubes.cubes:
+                self.gl.blockSound.playStepSound(self.gl.cubes.cubes[(ox, oy, oz)].name, custom=5)
+
         stg = int(self.destroyStage)
         self.gl.stuffBatch.add(4, mode, self.textures[stg], ('v3f', vertexes[0]),
                                tex_coords)  # back
@@ -59,9 +62,13 @@ class DestroyBlock:
                                tex_coords)  # top
 
     def destroy(self, blockName, blockByVec):
-        if self.destroyStage == -1:
+        if self.destroyStage == -1 or blockByVec[0] != self.destroyPos:
             self.destroyStage = 0
-        self.destroyStage += 0.1
+            self.destroyPos = blockByVec[0]
+
+        if blockName != "bedrock":
+            self.destroyStage += 0.1
+
         if self.destroyStage > 9:
             self.destroyStage = -1
             if blockByVec[0] in self.gl.cubes.cubes:

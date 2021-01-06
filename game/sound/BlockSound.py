@@ -36,9 +36,9 @@ class BlockSound:
         chnl = sound.play()
         chnl.set_volume(self.gl.sound.volume)
 
-    def playStepSound(self, blockName):
+    def playStepSound(self, blockName, custom=300):
         self.cntr += 1
-        if self.cntr % 300 != 0:
+        if self.cntr % custom != 0 or self.cntr == 0:
             return
         blName = self.getBlockSound(blockName)
 

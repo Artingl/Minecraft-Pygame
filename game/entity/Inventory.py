@@ -22,10 +22,8 @@ class Inventory:
             self.heartAnimation.append([0, '-' if old else '+'])
         for i in range(9*4 + 1):
             block = ls[i][0]
-            if i == 0:
-                block = "crafting_table"
 
-            self.inventory[i] = [block, 64]
+            self.inventory[i] = [block, 0]
             self.blocksLabel[i] = pyglet.text.Label("0",
                                                     font_name='Minecraft Rus',
                                                     color=(255, 255, 255, 255),
@@ -46,7 +44,7 @@ class Inventory:
 
         if self.gl.inventory_textures:
             for i in range(9):
-                if self.inventory[i][1] == 0:
+                if self.inventory[i][1] == 0 or self.inventory[i][0] == 0:
                     continue
                 self.gl.inventory_textures[self.inventory[i][0]].blit(
                     (self.gl.WIDTH // 2 - (inventory.width // 2)) + (40 * i) + 11, 11)

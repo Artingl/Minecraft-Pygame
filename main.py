@@ -18,7 +18,7 @@ from OpenGL.GL import *
 
 def startNewGame():
     global mainFunction
-    menuChannelSound.stop()
+    sound.menuChannelSound.stop()
     mainFunction = genWorld
 
 
@@ -97,6 +97,7 @@ def drawMainMenu(mc):
     quitButton.update(mp, mc)
     #
 
+    # Splash
     glPushMatrix()
     glTranslatef((scene.WIDTH // 2 + (tex.width // 2)) - 40, scene.HEIGHT - tex.height - (scene.HEIGHT // 15) + 30, 0.0)
     glRotatef(20.0, 0.0, 0.0, 1.0)
@@ -105,6 +106,7 @@ def drawMainMenu(mc):
     drawInfoLabel(scene, splash, xx=1, yy=1, style=[('', '')], scale=var8, size=27, anchor_x='center',
                   label_color=(255, 255, 0), shadow_color=(63, 63, 0))
     glPopMatrix()
+    #
 
     pygame.display.flip()
     clock.tick(MAX_FPS)
@@ -214,10 +216,15 @@ for e, i in enumerate(os.listdir("sounds/gui/")):
     sound.SOUNDS["GUI"][soundName].append(pygame.mixer.Sound("sounds/gui/" + i))
     print("Successful loaded", soundName, "#" + soundNum, "sound!")
 
-print("Loading music...")
-for e, i in enumerate(os.listdir("sounds/music/")):
-    sound.MUSIC.append("sounds/music/" + i)
+print("Loading menu music...")
+for e, i in enumerate(os.listdir("sounds/music/menu")):
+    sound.MENU_MUSIC.append("sounds/music/menu/" + i)
+
+print("Loading game music...")
+for e, i in enumerate(os.listdir("sounds/music/game")):
+    sound.MUSIC.append("sounds/music/game/" + i)
 sound.initMusic()
+
 print("Music loaded successful!")
 
 print("Loading GUI textures...")
@@ -302,17 +309,7 @@ splash = splfile.read().split("\n")
 splash = splash[randint(0, len(splash) - 1)]
 splfile.close()
 
-menuChannelSound = pygame.mixer.music
-menuSound = ["sounds/music/10.mp3", "sounds/music/11.mp3", "sounds/music/12.mp3", "sounds/music/13.mp3"]
-musicNum = randint(0, len(menuSound) - 1)
-menuChannelSound.load(menuSound[musicNum])
-for i in range(len(menuSound)):
-    if i == musicNum:
-        continue
-    menuChannelSound.queue(menuSound[i])
-menuChannelSound.play()
-menuChannelSound.queue(menuSound[i])
-menuChannelSound.set_volume(sound.volume)
+sound.menuChannelSound.play()
 
 singleplayerButton = Button(scene, "Singleplayer", 0, 0)
 quitButton = Button(scene, "Quit game", 0, 0)
@@ -326,6 +323,8 @@ mainMenuRotation = [50, 180, True]
 mainFunction = drawMainMenu
 
 while True:
+    if pygame.mouse.get_pressed(3)[0]:
+        player.mouseEvent(1)
     mbclicked = None
 
     for event in pygame.event.get():
@@ -387,16 +386,24 @@ while True:
                         if player.cameraType > 3:
                             player.cameraType = 1
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    player.mouseEvent(event.button)
                     if event.button == 4:
                         player.inventory.activeInventory -= 1
                         if player.inventory.activeInventory < 0:
                             player.inventory.activeInventory = 8
-                        gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
+                        if player.inventory.inventory[player.inventory.activeInventory][1]:
+                            gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
                     elif event.button == 5:
                         player.inventory.activeInventory += 1
                         if player.inventory.activeInventory > 8:
                             player.inventory.activeInventory = 0
-                        gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
+                        if player.inventory.inventory[player.inventory.activeInventory][1]:
+                            gui.showText(player.inventory.inventory[player.inventory.activeInventory][0])
+                else:
+                    if pygame.mouse.get_pressed(3)[0]:
+                        player.mouseEvent(1)
+                    else:
+                        player.mouseEvent(-1)
     if scene.allowEvents["grabMouse"]:
         pygame.mouse.set_visible(PAUSE)
     else:
@@ -407,7 +414,6 @@ while True:
 
     if not PAUSE:
         sound.playMusic()
-        player.mouseEvent(pygame.mouse.get_pressed(3))
 
         if scene.allowEvents["showCrosshair"]:
             gui.shows["crosshair"][1] = (scene.WIDTH // 2 - 9, scene.HEIGHT // 2 - 9)

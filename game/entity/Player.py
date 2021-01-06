@@ -202,15 +202,15 @@ class Player:
     def mouseEvent(self, button):
         blockByVec = self.gl.cubes.hitTest(self.position, self.get_sight_vector())
 
-        if button[0] and blockByVec[0]:
+        if button == 1 and blockByVec[0]:
             self.gl.destroy.destroy(self.gl.cubes.cubes[blockByVec[0]].name, blockByVec)
         else:
             self.gl.destroy.destroyStage = -1
 
-        if button[1] and blockByVec[0]:
+        if button == 2 and blockByVec[0]:
             self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
             self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
-        if button[2]:
+        if button == 3:
             if blockByVec[0] and self.shift <= 0:
                 if blockByVec[0] in self.gl.cubes.cubes:
                     if canOpenBlock(self, self.gl.cubes.cubes[blockByVec[0]], self.gl):
