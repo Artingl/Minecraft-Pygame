@@ -60,7 +60,7 @@ class ModalWindow:
                 hover.width = w
                 hover.height = h
                 hover.blit(x, self.gl.HEIGHT - y - h)
-        
+
         for i in self.updateFunctions:
             i(win, mp)
 

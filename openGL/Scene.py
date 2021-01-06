@@ -17,24 +17,12 @@ class Scene:
         print("Init Scene class...")
 
         self.WIDTH, self.HEIGHT = WIDTH, HEIGHT
-        self.allowEvents = {
-            "movePlayer": True,
-            "grabMouse": True,
-            "keyboardAndMouse": True,
-            "showCrosshair": True,
-        }
 
-        self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
-        self.chunkg = len(self.worldSp)
-        self.drawCounter = 0
-        self.in_water = False
-        self.worldGen = worldGenerator(self, randint(434, 434343454))
-        self.particles = Particles(self)
-        self.destroy = DestroyBlock(self)
         self.gui = None
         self.sound = None
         self.blockSound = None
         self.player = None
+
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV
         self.updateEvents = []
@@ -46,6 +34,24 @@ class Scene:
         self.lightingColor = 200
         self.startPlayerPos = [0, -90, 0]
         self.panorama = {}
+        self.drawCounter = 0
+        self.in_water = False
+
+        self.resetScene()
+
+    def resetScene(self):
+        self.allowEvents = {
+            "movePlayer": True,
+            "grabMouse": True,
+            "keyboardAndMouse": True,
+            "showCrosshair": True,
+        }
+
+        self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
+        self.chunkg = len(self.worldSp)
+        self.worldGen = worldGenerator(self, randint(434, 434343454))
+        self.particles = Particles(self)
+        self.destroy = DestroyBlock(self)
 
     def loadPanoramaTextures(self):
         print("Loading panorama textures...")

@@ -1,19 +1,42 @@
 import math
 import os
-import time
-import timeit
 from random import randint
-
+import pyglet
+from OpenGL.GL import *
 from functions import drawInfoLabel, getElpsTime
 from game.GUI.Button import Button
+from game.GUI.GUI import GUI
+from game.entity.Player import Player
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
-from game.GUI.GUI import GUI
-import pyglet
-from game.entity.Player import Player
 from openGL.Scene import Scene
 from settings import *
-from OpenGL.GL import *
+
+
+def quitToMenu():
+    global PAUSE, IN_MENU, mainFunction
+
+    tex = gui.GUI_TEXTURES["options_background"]
+    tex2 = gui.GUI_TEXTURES["black"]
+    for x in range(0, scene.WIDTH, tex.width):
+        for y in range(0, scene.HEIGHT, tex.height):
+            tex.blit(x, y)
+            tex2.blit(x, y)
+    drawInfoLabel(scene, "Quitting to main menu", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2,
+                  style=[('', '')], size=12, anchor_x='center')
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
+
+    PAUSE = True
+    IN_MENU = True
+
+    scene.resetScene()
+
+    print("Loading the game...")
+    player.position = [0, -90, 0]
+
+    scene.initScene()
+    mainFunction = drawMainMenu
 
 
 def showSettings():
@@ -27,7 +50,41 @@ def startNewGame():
     mainFunction = genWorld
 
 
-def genWorld(mbclicked):
+def pause():
+    global PAUSE
+    PAUSE = not PAUSE
+    scene.allowEvents["movePlayer"] = True
+    scene.allowEvents["keyboardAndMouse"] = True
+
+
+def pauseMenu(mc):
+    bg = gui.GUI_TEXTURES["black"]
+    bg.width = scene.WIDTH
+    bg.height = scene.HEIGHT
+    bg.blit(0, 0)
+
+    mp = pygame.mouse.get_pos()
+
+    drawInfoLabel(scene, f"Game menu", xx=scene.WIDTH // 2, yy=scene.HEIGHT - scene.HEIGHT // 4, style=[('', '')],
+                  size=12, anchor_x='center')
+
+    # Back to Game button
+    resumeButton.x = scene.WIDTH // 2 - (resumeButton.button.width // 2)
+    resumeButton.y = scene.HEIGHT // 2 - (resumeButton.button.height // 2) - 50
+    resumeButton.update(mp, mc)
+    #
+
+    # Quit to main menu button
+    quitWorldButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
+    quitWorldButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2)
+    quitWorldButton.update(mp, mc)
+    #
+
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
+
+
+def genWorld(mc):
     global IN_MENU, PAUSE, resizeEvent
 
     scene.set2d()
@@ -332,6 +389,7 @@ splfile.close()
 sound.menuChannelSound.play()
 sound.menuChannelSound.set_volume(sound.volume)
 
+# Main menu buttons
 singleplayerButton = Button(scene, "Singleplayer", 0, 0)
 optionsButton = Button(scene, "Options", 0, 0)
 quitButton = Button(scene, "Quit game", 0, 0)
@@ -339,6 +397,15 @@ quitButton = Button(scene, "Quit game", 0, 0)
 singleplayerButton.setEvent(startNewGame)
 optionsButton.setEvent(showSettings)
 quitButton.setEvent(exit)
+#
+
+# Pause menu buttons
+resumeButton = Button(scene, "Back to Game", 0, 0)
+quitWorldButton = Button(scene, "Quit to main menu", 0, 0)
+
+resumeButton.setEvent(pause)
+quitWorldButton.setEvent(quitToMenu)
+#
 
 print("Loading complete!")
 mainMenuRotation = [50, 180, True]
@@ -346,7 +413,7 @@ mainMenuRotation = [50, 180, True]
 mainFunction = drawMainMenu
 
 while True:
-    if scene.allowEvents["keyboardAndMouse"]:
+    if scene.allowEvents["keyboardAndMouse"] and not PAUSE:
         if pygame.mouse.get_pressed(3)[0]:
             player.mouseEvent(1)
     mbclicked = None
@@ -384,7 +451,7 @@ while True:
             if scene.allowEvents["keyboardAndMouse"]:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        PAUSE = not PAUSE
+                        pause()
                     if event.key == pygame.K_e:
                         player.inventory.showWindow()
                     if event.key == pygame.K_1:
@@ -460,3 +527,16 @@ while True:
                           f"Chunks: {scene.chunkg}")
         pygame.display.flip()
         clock.tick(MAX_FPS)
+    elif PAUSE and not IN_MENU:
+        scene.allowEvents["movePlayer"] = False
+        scene.allowEvents["keyboardAndMouse"] = False
+        if scene.allowEvents["showCrosshair"]:
+            gui.shows["crosshair"][1] = (scene.WIDTH // 2 - 9, scene.HEIGHT // 2 - 9)
+        else:
+            gui.shows["crosshair"][1] = (-100, -100)
+        scene.updateScene()
+
+        player.inventory.draw()
+        gui.update()
+
+        pauseMenu(mbclicked)

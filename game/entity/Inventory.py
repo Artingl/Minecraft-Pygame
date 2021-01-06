@@ -66,16 +66,21 @@ class Inventory:
                     self.inventory[cell] = self.draggingItem
                     self.draggingItem = safe
             else:
-                self.draggingItem = [self.inventory[cell][0], self.inventory[cell][1]]
-                self.inventory[cell][1] = 0
+                if self.inventory[cell][1] != 0:
+                    self.draggingItem = [self.inventory[cell][0], self.inventory[cell][1]]
+                    self.inventory[cell][1] = 0
 
     def updateWindow(self, win, mousePos):
         if self.draggingItem:
             drg = self.draggingItem
-            self.gl.inventory_textures[drg[0]].blit(mousePos[0], self.gl.HEIGHT - mousePos[1])
+            mp = list(mousePos)
+            mp[0] -= 11
+            mp[1] += 11
 
-            lx = mousePos[0] + 11
-            ly = self.gl.HEIGHT - mousePos[1] - 5
+            self.gl.inventory_textures[drg[0]].blit(mp[0], self.gl.HEIGHT - mp[1])
+
+            lx = mp[0] + 11
+            ly = self.gl.HEIGHT - mp[1] - 5
             lbl = pyglet.text.Label(str(drg[1]),
                                     font_name='Minecraft Rus',
                                     color=(255, 255, 255, 255),
@@ -119,6 +124,8 @@ class Inventory:
         if ext:
             self.inventory[extech][1] += 1
         else:
+            if self.inventory[self.activeInventory][1] == 0:
+                sech = self.activeInventory
             self.inventory[sech] = [name, 1]
 
     def draw(self):
