@@ -1,6 +1,4 @@
-from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
 from pyglet.gl import *
 
 from functions import *
@@ -11,7 +9,7 @@ from game.entity.Inventory import Inventory
 from game.entity.Zombie import Zombie
 from game.world.Clouds import Clouds
 from game.world.worldGenerator import worldGenerator
-from openGL.CubeHandler import CubeHandler
+from game.blocks.CubeHandler import CubeHandler
 
 
 class Scene:
@@ -25,6 +23,8 @@ class Scene:
         self.blockSound = None
         self.deathScreen = None
         self.player = None
+
+        self.lookingAt = "Nothing"
 
         self.texture, self.block, self.texture_dir, self.inventory_textures = {}, {}, {}, {}
         self.fov = FOV
@@ -220,6 +220,11 @@ class Scene:
             pyglet.graphics.draw(24, GL_QUADS, ('v3f/static', flatten(cube_vertices(blockByVec[0], 0.51))))
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
             glColor3d(1, 1, 1)
+
+            self.lookingAt = f"{blockByVec[0][0]} {blockByVec[0][1]} {blockByVec[0][2]} " \
+                             f"({self.cubes.cubes[blockByVec[0]].name})"
+        else:
+            self.lookingAt = "Nothing"
 
         glColor3d(1, 1, 1)
         glPopMatrix()

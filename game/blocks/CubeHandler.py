@@ -1,8 +1,7 @@
-import pyglet
 from OpenGL.GL import *
 
 from functions import roundPos, cube_vertices, adjacent
-from openGL.Cube import Cube
+from game.blocks.Cube import Cube
 
 
 class CubeHandler:

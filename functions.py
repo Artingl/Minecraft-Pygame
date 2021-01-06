@@ -106,7 +106,7 @@ def spiral(n):
 
 
 def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1, rotate=0,
-                  label_color=(255, 255, 255), shadow_color=(56, 56, 56), scale=0):
+                  label_color=(255, 255, 255), shadow_color=(56, 56, 56), scale=0, shadow=True):
     if style is None:
         style = []
     y = -21
@@ -133,7 +133,7 @@ def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', an
                                 anchor_x=anchor_x,
                                 anchor_y=anchor_y)
         if not style:
-            lbl.set_style("background_color", (104, 104, 104, 160))
+            lbl.set_style("background_color", (69, 69, 69, 100))
         else:
             for st in style:
                 lbl.set_style(st[0], st[1])
@@ -144,7 +144,8 @@ def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', an
             glScalef(scale, scale, 0)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        shadow_lbl.draw()
+        if shadow:
+            shadow_lbl.draw()
         lbl.draw()
         if rotate:
             glRotatef(-rotate, 0.0, 0.0, 1.0)

@@ -9,7 +9,7 @@ from game.GUI.GUI import GUI
 from game.entity.Player import Player
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
-from openGL.Scene import Scene
+from game.Scene import Scene
 from settings import *
 
 
@@ -93,7 +93,7 @@ def drawDeathScreen(mc):
     respawnButton.update(mp, mc)
     #
 
-    # Quit to main menu button
+    # Quit to title button
     quitWorldButton.text = "Title screen"
     quitWorldButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
     quitWorldButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2)
@@ -121,8 +121,8 @@ def pauseMenu(mc):
     resumeButton.update(mp, mc)
     #
 
-    # Quit to main menu button
-    quitWorldButton.text = "Quit to main menu"
+    # Quit to title button
+    quitWorldButton.text = "Quit to title"
     quitWorldButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
     quitWorldButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2)
     quitWorldButton.update(mp, mc)
@@ -457,7 +457,7 @@ quitButton.setEvent(exit)
 
 # Pause menu buttons
 resumeButton = Button(scene, "Back to Game", 0, 0)
-quitWorldButton = Button(scene, "Quit to main menu", 0, 0)
+quitWorldButton = Button(scene, "Quit to title", 0, 0)
 
 resumeButton.setEvent(pause)
 quitWorldButton.setEvent(quitToMenu)
@@ -581,11 +581,13 @@ while True:
         gui.update()
 
         if showInfoLabel:
-            drawInfoLabel(scene, f"FPS: {round(clock.get_fps())}\n"
-                          f"X Y Z: {round(player.x(), 3)}  {round(player.y(), 3)}  {round(player.z(), 3)}\n"
-                          f"World seed: {scene.worldGen.seed}\n"
-                          f"Count of particles: {len(scene.particles.particles)}\n"
-                          f"Chunks: {scene.chunkg}")
+            drawInfoLabel(scene, f"Minecraft {MC_VERSION} ({MC_VERSION}/vanilla)\n"
+                                 f"{round(clock.get_fps())} fps\n"
+                                 f"\n"
+                                 f"XYZ: {round(player.x(), 3)} / {round(player.y(), 5)} / {round(player.z(), 3)}\n"
+                                 f"Block: {round(player.x())} / {round(player.y())} / {round(player.z())}\n"
+                                 f"Facing: {player.rotation[1]} / {player.rotation[0]}\n"
+                                 f"Looking at: {scene.lookingAt}", shadow=False, label_color=(224, 224, 224), xx=3)
         pygame.display.flip()
         clock.tick(MAX_FPS)
     elif PAUSE and not IN_MENU:
