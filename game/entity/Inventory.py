@@ -4,6 +4,7 @@ from random import randint
 import pyglet
 from pyglet.gl import GL_QUADS
 
+from game.GUI.ModalWindow import ModalWindow
 from settings import *
 
 
@@ -14,13 +15,14 @@ class Inventory:
         self.blocksLabel = {}
         self.activeInventory = 0
         self.heartAnimation = []
+        self.draggingItem = []
 
         ls = list(self.gl.inventory_textures.items())
         old = False
         for i in range(10):
             old = not old
             self.heartAnimation.append([0, '-' if old else '+'])
-        for i in range(9*4 + 1):
+        for i in range(9 * 4 + 1):
             block = ls[i][0]
 
             self.inventory[i] = [block, 0]
@@ -29,6 +31,77 @@ class Inventory:
                                                     color=(255, 255, 255, 255),
                                                     font_size=10,
                                                     x=self.gl.WIDTH // 2, y=60)
+
+    def initWindow(self):
+        self.window = ModalWindow(self.gl)
+        self.window.setWindow(self.gl.gui.GUI_TEXTURES["inventory_window"])
+        self.window.clickEvent = self.windowClickEvent
+        self.window.updateFunctions.append(self.updateWindow)
+
+        x = 16
+        for i in range(9):
+            self.window.cellPositions[i] = [(x, 284), None]
+            x += 36
+
+        x, y = 16, 168
+        for i in range(9 * 3, 0, -1):
+            self.window.cellPositions[9 + i] = [(x, y), None]
+
+            x += 36
+            if x > 304:
+                x = 16
+                y += 36
+
+    def showWindow(self):
+        self.window.show()
+
+    def windowClickEvent(self, button, cell):
+        if button[0]:
+            if self.draggingItem:
+                if self.inventory[cell][1] == 0:
+                    self.inventory[cell] = self.draggingItem
+                    self.draggingItem = []
+                else:
+                    safe = [self.inventory[cell][0], self.inventory[cell][1]]
+                    self.inventory[cell] = self.draggingItem
+                    self.draggingItem = safe
+            else:
+                self.draggingItem = [self.inventory[cell][0], self.inventory[cell][1]]
+                self.inventory[cell][1] = 0
+
+    def updateWindow(self, win, mousePos):
+        if self.draggingItem:
+            drg = self.draggingItem
+            self.gl.inventory_textures[drg[0]].blit(mousePos[0], self.gl.HEIGHT - mousePos[1])
+
+            lx = mousePos[0] + 11
+            ly = self.gl.HEIGHT - mousePos[1] - 5
+            lbl = pyglet.text.Label(str(drg[1]),
+                                    font_name='Minecraft Rus',
+                                    color=(255, 255, 255, 255),
+                                    font_size=10,
+                                    x=lx, y=ly)
+            lbl.draw()
+
+        for i in self.window.cellPositions.items():
+            xx, yy = self.window.cellPositions[i[0]][0][0], self.window.cellPositions[i[0]][0][1]
+
+            self.window.cellPositions[i[0]][1] = self.inventory[i[0]]
+            inv = self.inventory[i[0]]
+
+            if inv[1] == 0 or inv[0] == 0:
+                continue
+            self.gl.inventory_textures[inv[0]].blit((self.gl.WIDTH // 2 - (win.width // 2)) + xx + 5,
+                                                    (self.gl.HEIGHT // 2 + (win.height // 2)) - yy - 27)
+
+            lx = (self.gl.WIDTH // 2 - (win.width // 2)) + xx + 15
+            ly = (self.gl.HEIGHT // 2 + (win.height // 2)) - yy - 32
+            lbl = pyglet.text.Label(str(inv[1]),
+                                    font_name='Minecraft Rus',
+                                    color=(255, 255, 255, 255),
+                                    font_size=10,
+                                    x=lx, y=ly)
+            lbl.draw()
 
     def addBlock(self, name, count=1):
         ext = False

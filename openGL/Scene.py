@@ -20,7 +20,7 @@ class Scene:
         self.allowEvents = {
             "movePlayer": True,
             "grabMouse": True,
-            "keyboard": True,
+            "keyboardAndMouse": True,
             "showCrosshair": True,
         }
 

@@ -16,6 +16,11 @@ from settings import *
 from OpenGL.GL import *
 
 
+def showSettings():
+    global mainFunction
+    mainFunction = genWorld
+
+
 def startNewGame():
     global mainFunction
     sound.menuChannelSound.stop()
@@ -91,9 +96,15 @@ def drawMainMenu(mc):
     singleplayerButton.update(mp, mc)
     #
 
+    # Options button
+    optionsButton.x = scene.WIDTH // 2 - (optionsButton.button.width // 2)
+    optionsButton.y = scene.HEIGHT // 2 - (optionsButton.button.height // 2) + 25
+    optionsButton.update(mp, mc)
+    #
+
     # Quit button
     quitButton.x = scene.WIDTH // 2 - (quitButton.button.width // 2)
-    quitButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2) + 25
+    quitButton.y = scene.HEIGHT // 2 - (quitButton.button.height // 2) + 75
     quitButton.update(mp, mc)
     #
 
@@ -232,6 +243,7 @@ print("Music loaded successful!")
 print("Loading GUI textures...")
 gui.GUI_TEXTURES = {
     "crafting_table": pyglet.resource.image("gui/crafting_table.png"),
+    "inventory_window": pyglet.resource.image("gui/inventory_window.png"),
     "crosshair": pyglet.resource.image("gui/crosshair.png"),
     "inventory": pyglet.resource.image("gui/inventory.png"),
     "sel_inventory": pyglet.resource.image("gui/sel_inventory.png"),
@@ -250,6 +262,10 @@ gui.GUI_TEXTURES = {
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
 texture = gui.GUI_TEXTURES["crafting_table"]
+texture.width *= 2
+texture.height *= 2
+
+texture = gui.GUI_TEXTURES["inventory_window"]
 texture.width *= 2
 texture.height *= 2
 
@@ -303,6 +319,8 @@ texture.height *= 2
 
 gui.addGuiElement("crosshair", (scene.WIDTH // 2 - 9, scene.HEIGHT // 2 - 9))
 
+player.inventory.initWindow()
+
 showInfoLabel = False
 
 print("Loading splashes...")
@@ -315,9 +333,11 @@ sound.menuChannelSound.play()
 sound.menuChannelSound.set_volume(sound.volume)
 
 singleplayerButton = Button(scene, "Singleplayer", 0, 0)
+optionsButton = Button(scene, "Options", 0, 0)
 quitButton = Button(scene, "Quit game", 0, 0)
 
 singleplayerButton.setEvent(startNewGame)
+optionsButton.setEvent(showSettings)
 quitButton.setEvent(exit)
 
 print("Loading complete!")
@@ -326,8 +346,9 @@ mainMenuRotation = [50, 180, True]
 mainFunction = drawMainMenu
 
 while True:
-    if pygame.mouse.get_pressed(3)[0]:
-        player.mouseEvent(1)
+    if scene.allowEvents["keyboardAndMouse"]:
+        if pygame.mouse.get_pressed(3)[0]:
+            player.mouseEvent(1)
     mbclicked = None
 
     for event in pygame.event.get():
@@ -360,10 +381,12 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             mbclicked = event.button
         if not IN_MENU:
-            if scene.allowEvents["keyboard"]:
+            if scene.allowEvents["keyboardAndMouse"]:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         PAUSE = not PAUSE
+                    if event.key == pygame.K_e:
+                        player.inventory.showWindow()
                     if event.key == pygame.K_1:
                         player.inventory.activeInventory = 0
                     if event.key == pygame.K_2:

@@ -7,7 +7,11 @@ class ModalWindow:
     def __init__(self, gl):
         self.gl = gl
         self.cellPositions = {}
+        self.updateFunctions = []
+        self.clickEvent = None
+        self.lastClickCall = []
 
+        self.clickWait = 1
         self.windowId = 0
         self.window = None
 
@@ -15,7 +19,7 @@ class ModalWindow:
         self.window = win
 
     def destroyWindow(self):
-        self.gl.allowEvents["keyboard"] = True
+        self.gl.allowEvents["keyboardAndMouse"] = True
         self.gl.allowEvents["grabMouse"] = True
         self.gl.allowEvents["movePlayer"] = True
         self.gl.allowEvents["showCrosshair"] = True
@@ -23,7 +27,12 @@ class ModalWindow:
         self.gl.updateEvents.pop(self.windowId)
 
     def drawWindow(self):
-        self.gl.allowEvents["keyboard"] = False
+        self.clickWait += 1
+        if self.clickWait == 40:
+            self.clickWait = 1
+            self.lastClickCall = []
+
+        self.gl.allowEvents["keyboardAndMouse"] = False
         self.gl.allowEvents["grabMouse"] = False
         self.gl.allowEvents["movePlayer"] = False
         self.gl.allowEvents["showCrosshair"] = False
@@ -31,8 +40,8 @@ class ModalWindow:
         win = self.window
         win.blit(self.gl.WIDTH // 2 - (win.width // 2), self.gl.HEIGHT // 2 - (win.height // 2))
 
-
         mp = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed(3)
 
         hover = self.gl.gui.GUI_TEXTURES["selected"]
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -44,31 +53,16 @@ class ModalWindow:
             x += self.gl.WIDTH // 2 - (win.width // 2)
             y += self.gl.HEIGHT // 2 - (win.height // 2)
             if checkHover(x, y, w, h, mp[0], mp[1]):
-                print(i[0])
+                if click[0] or click[1] or click[2]:
+                    if self.clickEvent and self.lastClickCall != [click, i[0]]:
+                        self.clickEvent(click, i[0])
+                        self.lastClickCall = [click, i[0]]
                 hover.width = w
                 hover.height = h
                 hover.blit(x, self.gl.HEIGHT - y - h)
-
-        by = 117
-        for i in self.cellPositions.items():
-            if i[0] <= 9:
-                continue
-            bid = 45 - i[0]
-            xx, yy = self.cellPositions[bid + 10][0][0], self.cellPositions[bid + 10][0][1]
-
-            self.cellPositions[bid + 9][1] = self.gl.player.inventory.inventory[bid]
-            inv = self.gl.player.inventory.inventory[bid]
-
-            if inv[1] == 0 or inv[0] == 0:
-                continue
-            self.gl.inventory_textures[inv[0]].blit((self.gl.WIDTH // 2 - (win.width // 2)) + xx + 5,
-                                                    (self.gl.HEIGHT // 2 + (win.height // 2)) - yy + by - 27)
-            if by == 117 and bid % 9 == 0:
-                by -= 9
-            if bid % 9 == 0:
-                by -= 72
-            if by == -108:
-                by -= 9
+        
+        for i in self.updateFunctions:
+            i(win, mp)
 
         key = pygame.key.get_pressed()
         if key[pygame.K_ESCAPE]:
