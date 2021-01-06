@@ -99,11 +99,11 @@ def drawMainMenu(mc):
 
     # Splash
     glPushMatrix()
-    glTranslatef((scene.WIDTH // 2 + (tex.width // 2)) - 40, scene.HEIGHT - tex.height - (scene.HEIGHT // 15) + 30, 0.0)
+    glTranslatef((scene.WIDTH // 2 + (tex.width // 2)) - 90, scene.HEIGHT - tex.height - (scene.HEIGHT // 15) + 15, 0.0)
     glRotatef(20.0, 0.0, 0.0, 1.0)
     var8 = 1.8 - abs(math.sin((getElpsTime() % 1000) / 1000.0 * math.pi * 2.0) * 0.1)
     var8 = var8 * 100.0 / ((24 * 12) + 32)
-    drawInfoLabel(scene, splash, xx=1, yy=1, style=[('', '')], scale=var8, size=27, anchor_x='center',
+    drawInfoLabel(scene, splash, xx=1, yy=1, style=[('', '')], scale=var8, size=30, anchor_x='center',
                   label_color=(255, 255, 0), shadow_color=(63, 63, 0))
     glPopMatrix()
     #
@@ -219,10 +219,12 @@ for e, i in enumerate(os.listdir("sounds/gui/")):
 print("Loading menu music...")
 for e, i in enumerate(os.listdir("sounds/music/menu")):
     sound.MENU_MUSIC.append("sounds/music/menu/" + i)
+    print("Successful loaded", i, "music!")
 
 print("Loading game music...")
 for e, i in enumerate(os.listdir("sounds/music/game")):
     sound.MUSIC.append("sounds/music/game/" + i)
+    print("Successful loaded", i, "music!")
 sound.initMusic()
 
 print("Music loaded successful!")
@@ -310,6 +312,7 @@ splash = splash[randint(0, len(splash) - 1)]
 splfile.close()
 
 sound.menuChannelSound.play()
+sound.menuChannelSound.set_volume(sound.volume)
 
 singleplayerButton = Button(scene, "Singleplayer", 0, 0)
 quitButton = Button(scene, "Quit game", 0, 0)

@@ -40,10 +40,6 @@ class DestroyBlock:
 
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
         mode = GL_QUADS
-        if int(self.destroyStage) % 5 == 0:
-            if (ox, oy, oz) in self.gl.cubes.cubes:
-                self.gl.blockSound.playStepSound(self.gl.cubes.cubes[(ox, oy, oz)].name, custom=5)
-
         stg = int(self.destroyStage)
         self.gl.stuffBatch.add(4, mode, self.textures[stg], ('v3f', vertexes[0]),
                                tex_coords)  # back
@@ -72,13 +68,8 @@ class DestroyBlock:
         if self.destroyStage > 9:
             self.destroyStage = -1
             if blockByVec[0] in self.gl.cubes.cubes:
-                if self.gl.player.inventory.inventory[self.gl.player.inventory.activeInventory][0] == \
-                        self.gl.cubes.cubes[blockByVec[0]].name:
-                    self.gl.player.inventory.inventory[self.gl.player.inventory.activeInventory][1] += 1
-                elif self.gl.player.inventory.inventory[self.gl.player.inventory.activeInventory][1] == 0:
-                    self.gl.player.inventory.inventory[self.gl.player.inventory.activeInventory][1] += 1
-                    self.gl.player.inventory.inventory[self.gl.player.inventory.activeInventory][0] = \
-                        self.gl.cubes.cubes[blockByVec[0]].name
+                self.gl.player.inventory.addBlock(self.gl.cubes.cubes[blockByVec[0]].name)
+
             self.gl.blockSound.playBlockSound(self.gl.cubes.cubes[blockByVec[0]].name)
             self.gl.particles.addParticle(self.gl.cubes.cubes[blockByVec[0]].p, self.gl.cubes.cubes[blockByVec[0]],
                                           direction="down")

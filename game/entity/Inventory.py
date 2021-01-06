@@ -30,6 +30,24 @@ class Inventory:
                                                     font_size=10,
                                                     x=self.gl.WIDTH // 2, y=60)
 
+    def addBlock(self, name, count=1):
+        ext = False
+        extech = -1
+        sech = -1
+        for item in self.inventory.items():
+            i = item[1]
+            if i[1] == 0 and sech == -1:
+                sech = item[0]
+            elif i[1] != 0:
+                if i[0] == name and i[1] + 1 <= 64:
+                    ext = True
+                    extech = item[0]
+                    break
+        if ext:
+            self.inventory[extech][1] += 1
+        else:
+            self.inventory[sech] = [name, 1]
+
     def draw(self):
         inventory = self.gl.gui.GUI_TEXTURES["inventory"]
         sel_inventory = self.gl.gui.GUI_TEXTURES["sel_inventory"]
