@@ -10,8 +10,8 @@ class droppedBlock:
         self.gl = gl
         self.blocks = {}
 
-    def addBlock(self, coords, name):
-        self.blocks[len(self.blocks)] = [coords, name, randint(0, 2) / 10, [0, "-"], 0]
+    def addBlock(self, coords, name, dr=True):
+        self.blocks[len(self.blocks)] = [coords, name, randint(0, 2) / 10, [0, "-"], 0, dr]
 
     def update(self):
         cpy = self.blocks.copy().items()
@@ -72,18 +72,19 @@ class droppedBlock:
             tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
             self.gl.stuffBatch.add(4, GL_QUADS, block[4], ('v3f', vertexes[0]),
                                    tex_coords)  # back
-            self.gl.stuffBatch.add(4, GL_QUADS, block[5], ('v3f', vertexes[1]),
-                                   tex_coords)  # front
+            if i[1][5]:
+                self.gl.stuffBatch.add(4, GL_QUADS, block[5], ('v3f', vertexes[1]),
+                                       tex_coords)  # front
 
-            self.gl.stuffBatch.add(4, GL_QUADS, block[0], ('v3f', vertexes[2]),
-                                   tex_coords)  # left
-            self.gl.stuffBatch.add(4, GL_QUADS, block[1], ('v3f', vertexes[3]),
-                                   tex_coords)  # right
+                self.gl.stuffBatch.add(4, GL_QUADS, block[0], ('v3f', vertexes[2]),
+                                       tex_coords)  # left
+                self.gl.stuffBatch.add(4, GL_QUADS, block[1], ('v3f', vertexes[3]),
+                                       tex_coords)  # right
 
-            self.gl.stuffBatch.add(4, GL_QUADS, block[2], ('v3f', vertexes[4]),
-                                   tex_coords)  # bottom
-            self.gl.stuffBatch.add(4, GL_QUADS, block[3], ('v3f', vertexes[5]),
-                                   tex_coords)  # top
+                self.gl.stuffBatch.add(4, GL_QUADS, block[2], ('v3f', vertexes[4]),
+                                       tex_coords)  # bottom
+                self.gl.stuffBatch.add(4, GL_QUADS, block[3], ('v3f', vertexes[5]),
+                                       tex_coords)  # top
 
             if i[1][3][1] == "-":
                 i[1][3][0] -= 0.003
