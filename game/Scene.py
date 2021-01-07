@@ -1,3 +1,6 @@
+import gc
+import threading
+
 from OpenGL.GLU import *
 from pyglet.gl import *
 
@@ -38,6 +41,7 @@ class Scene:
         self.startPlayerPos = [0, -90, 0]
         self.panorama = {}
         self.drawCounter = 0
+        self.genTime = 1
         self.in_water = False
 
         self.resetScene()
@@ -50,8 +54,6 @@ class Scene:
             "showCrosshair": True,
         }
 
-        self.worldSp = spiral(CHUNKS_RENDER_DISTANCE)
-        self.chunkg = len(self.worldSp)
         self.clouds = Clouds(self)
         self.droppedBlock = droppedBlock(self)
         self.worldGen = worldGenerator(self, randint(434, 434343454))
@@ -168,11 +170,9 @@ class Scene:
 
     def genWorld(self):
         self.drawCounter += 1
-        if self.drawCounter > 1 and self.chunkg > 0:
+        if self.drawCounter > self.genTime:
             self.drawCounter = 0
-            x, y = self.worldSp[self.chunkg]
-            self.chunkg -= 1
-            self.worldGen.genChunk(CHUNKS_RENDER_DISTANCE // 2 - x, CHUNKS_RENDER_DISTANCE // 2 - y, self.player)
+            self.worldGen.genChunk(self.player)
 
     def updateScene(self):
         # self.time += 1 * clock.get_fps() / 1000
@@ -229,6 +229,8 @@ class Scene:
         glColor3d(1, 1, 1)
         glPopMatrix()
         self.set2d()
+
+        self.blockSound.pickUpAlreadyPlayed = False
 
         for i in self.updateEvents:
             i()

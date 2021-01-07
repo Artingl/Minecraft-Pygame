@@ -1,5 +1,7 @@
 import random
+from collections import deque
 
+from game.world.Biomes import Biomes, getBiomeByTemp
 from game.world.PerlinNoise import PerlinNoise
 from settings import *
 
@@ -9,45 +11,68 @@ class worldGenerator:
         self.seed = seed
         self.chunks = {}
         self.worldPerlin = PerlinNoise(seed, mh=6)
-        self.parent = glClass
+        self.perlinBiomes = PerlinNoise(seed ** 2, mh=4)
+        self.gl = glClass
+
+        q = []
+        for x in range(-90, 90, CHUNK_SIZE[0]):
+            for y in range(-90, 90, CHUNK_SIZE[2]):
+                q.append((x, y))
+        q = sorted(q, key=lambda i: i[0] ** 2 + i[1] ** 2)
+        self.queue = deque(q)
+
+        self.start = len(self.queue)
+        self.blocks = {}
+        self.loading = deque()
 
     def add(self, p, t):
-        self.parent.cubes.add(p, t, now=True)
+        if p in self.blocks:
+            return
+        self.blocks[p] = t
+        self.loading.append((p, t))
+        self.gl.cubes.add(p, t)
 
-    def genChunk(self, XX, YY, player):
+    def genChunk(self, player):
         if player.hp == -1:
             player.hp = 20
 
-        sx, sy, sz = CHUNK_SIZE
-        xx, zz = XX * (sx - 1), YY * (sz - 1)
+        if self.queue:
+            self.gen(*self.queue.popleft())
 
-        for x in range(xx, xx + 1):
-            for z in range(zz, zz + 1):
-                sand = False
+            while self.loading:
+                p, t = self.loading.popleft()
+                self.gl.cubes.updateCube(self.gl.cubes.cubes[p])
+
+    def gen(self, xx, zz):
+        sy = CHUNK_SIZE[1]
+
+        for x in range(xx, xx + CHUNK_SIZE[0]):
+            for z in range(zz, zz + CHUNK_SIZE[2]):
                 y = self.worldPerlin(x, z) + sy
+                biomePerlin = self.perlinBiomes(x, z) * 3
+                activeBiome = Biomes(getBiomeByTemp(biomePerlin))
+
+                self.add((x, y, z), activeBiome.getBiomeGrass())
+                if self.gl.startPlayerPos == [0, -90, 0]:
+                    self.gl.startPlayerPos = [x, y + 2, z]
+
                 if random.randint(0, 120) == 20 and y > sy - 5:
                     self.spawnTree(x, y, z)
-                if y < sy - 15:
-                    self.add((x, y, z), "sand")
-                    sand = True
-                else:
-                    self.add((x, y, z), "grass")
-                    if self.parent.startPlayerPos == [0, -90, 0]:
-                        self.parent.startPlayerPos = [x, y + 2, z]
+
                 self.add((x, 0, z), "bedrock")
                 for i in range(1, y):
                     if i > y - random.randint(5, 10):
-                        self.add((x, i, z), "sandstone" if sand else "dirt")
+                        self.add((x, i, z), activeBiome.getBiomeDirt())
                     else:
-                        self.add((x, i, z), "stone")
+                        self.add((x, i, z), activeBiome.getBiomeStone())
                     if i < sy - 20:
                         self.genOre(x, i, z)
 
     def genOre(self, x, y, z):
         if random.randint(0, 5753) != random.randint(0, 1575):
             return
-        r1 = random.randint(1, 7)
-        r2 = random.randint(r1, r1 + 7)
+        r1 = random.randint(-1, 2)
+        r2 = random.randint(-2, 2)
         ore = self.getOreByY(y)
 
         for xi in range(r1, r2):

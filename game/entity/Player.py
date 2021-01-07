@@ -177,13 +177,13 @@ class Player:
             if 3 < self.playerFallY:
                 # self.gl.sound.playSound("oof", 0.8)
                 hp -= 1
-                if self.playerFallY < 6:
+                if self.playerFallY < 10:
                     hp -= 3
-                elif self.playerFallY < 10:
+                elif self.playerFallY < 16:
                     hp -= 5
-                elif self.playerFallY < 17:
+                elif self.playerFallY < 23:
                     hp -= 8
-                elif self.playerFallY < 25:
+                elif self.playerFallY < 30:
                     hp -= 11
                 else:
                     hp = 0
@@ -215,8 +215,18 @@ class Player:
             self.gl.destroy.destroyStage = -1
 
         if button == 2 and blockByVec[0]:
-            self.inventory.inventory[self.inventory.activeInventory] = [self.gl.cubes.cubes[blockByVec[0]].name, 64]
-            self.gl.gui.showText(self.inventory.inventory[self.inventory.activeInventory][0])
+            if self.inventory.inventory[self.inventory.activeInventory][1] == 0:
+                itm = -1
+                for item in self.inventory.inventory.items():
+                    i = item[1]
+                    if i[0] == self.gl.cubes.cubes[blockByVec[0]].name and i[1] != 0:
+                        itm = item[0]
+                        break
+                if itm != -1:
+                    self.inventory.inventory[self.inventory.activeInventory] = [
+                        self.inventory.inventory[itm][0], self.inventory.inventory[itm][1]]
+                    self.inventory.inventory[itm][1] = 0
+                    self.gl.gui.showText(self.inventory.inventory[itm][0])
         if button == 3:
             if blockByVec[0] and self.shift <= 0:
                 if blockByVec[0] in self.gl.cubes.cubes:

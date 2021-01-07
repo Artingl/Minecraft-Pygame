@@ -28,7 +28,8 @@ class droppedBlock:
             for xs in (1, 0, -1):
                 for ys in (1, 0, -1, -2):
                     for zs in (1, 0, -1):
-                        if roundPos((pp[0] + xs, pp[1] + ys, pp[2] + zs)) == roundPos((x + kx, y + ky, z + kz)):
+                        if roundPos((pp[0] + xs, pp[1] + ys, pp[2] + zs)) == roundPos((x + kx, y + ky, z + kz)) and \
+                                self.gl.player.hp > 0:
                             self.blocks.pop(i[0])
                             self.gl.blockSound.playPickUpSound()
                             self.gl.player.inventory.addBlock(i[1][1])
@@ -61,7 +62,8 @@ class droppedBlock:
 
             for e, j in enumerate(vertexes):
                 r1 = (
-                     (j[0], j[1], j[2], 1), (j[3], j[4], j[5], 1), (j[6], j[7], j[8], 1), (j[9], j[10], j[11], 1)) @ rot
+                         (j[0], j[1], j[2], 1), (j[3], j[4], j[5], 1), (j[6], j[7], j[8], 1),
+                         (j[9], j[10], j[11], 1)) @ rot
                 vertexes[e] = (r1[0][0] + kx, r1[0][1] + ky, r1[0][2] + kz, r1[1][0] + kx, r1[1][1] + ky,
                                r1[1][2] + kz, r1[2][0] + kx, r1[2][1] + ky, r1[2][2] + kz,
                                r1[3][0] + kx, r1[3][1] + ky, r1[3][2] + kz)

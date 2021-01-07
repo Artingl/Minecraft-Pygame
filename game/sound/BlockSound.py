@@ -5,6 +5,7 @@ class BlockSound:
     def __init__(self, gl):
         self.gl = gl
         self.cntr = 0
+        self.pickUpAlreadyPlayed = False
 
     def getBlockSound(self, blockName):
         blName = "grass"
@@ -59,5 +60,7 @@ class BlockSound:
         chnl.set_volume(self.gl.sound.volume)
 
     def playPickUpSound(self):
-        chnl = self.gl.sound.BLOCKS_SOUND["pickUp"].play()
-        chnl.set_volume(self.gl.sound.volume)
+        if not self.pickUpAlreadyPlayed:
+            chnl = self.gl.sound.BLOCKS_SOUND["pickUp"].play()
+            chnl.set_volume(self.gl.sound.volume)
+            self.pickUpAlreadyPlayed = True

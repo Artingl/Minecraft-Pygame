@@ -134,11 +134,11 @@ def pauseMenu(mc):
 
 def genWorld(mc):
     global IN_MENU, PAUSE, resizeEvent
+    chunkCnt = 200
 
-    scene.set2d()
     tex = gui.GUI_TEXTURES["options_background"]
     tex2 = gui.GUI_TEXTURES["black"]
-    if scene.chunkg == len(scene.worldSp) or resizeEvent:
+    if scene.worldGen.start == len(scene.worldGen.queue) or resizeEvent:
         for x in range(0, scene.WIDTH, tex.width):
             for y in range(0, scene.HEIGHT, tex.height):
                 tex.blit(x, y)
@@ -153,11 +153,12 @@ def genWorld(mc):
                 tex2.blit(ix, iy)
 
     scene.genWorld()
-    if len(scene.worldSp) - scene.chunkg > 1:#1220:
+    if scene.worldGen.start - len(scene.worldGen.queue) > chunkCnt:
+        scene.genTime = 16
         IN_MENU = False
         PAUSE = False
 
-    proc = round((len(scene.worldSp) - scene.chunkg) * 100 / 1)#1220)
+    proc = round((scene.worldGen.start - len(scene.worldGen.queue)) * 100 / chunkCnt)
     drawInfoLabel(scene, "Loading world...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2, style=[('', '')],
                   size=12, anchor_x='center')
     drawInfoLabel(scene, f"Generating terrain {proc}%...", xx=scene.WIDTH // 2, yy=scene.HEIGHT // 2 - 39,
@@ -587,7 +588,10 @@ while True:
                                  f"XYZ: {round(player.x(), 3)} / {round(player.y(), 5)} / {round(player.z(), 3)}\n"
                                  f"Block: {round(player.x())} / {round(player.y())} / {round(player.z())}\n"
                                  f"Facing: {player.rotation[1]} / {player.rotation[0]}\n"
-                                 f"Looking at: {scene.lookingAt}", shadow=False, label_color=(224, 224, 224), xx=3)
+                                 f"Looking at: {scene.lookingAt}\n"
+                                 f"Count of chunks: {scene.worldGen.start - len(scene.worldGen.queue)} "
+                                 f"({scene.worldGen.start})",
+                          shadow=False, label_color=(224, 224, 224), xx=3)
         pygame.display.flip()
         clock.tick(MAX_FPS)
     elif PAUSE and not IN_MENU:

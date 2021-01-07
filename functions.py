@@ -88,23 +88,6 @@ def adjacent(x, y, z):
     for p in ((x - 1, y, z), (x + 1, y, z), (x, y - 1, z), (x, y + 1, z), (x, y, z - 1), (x, y, z + 1)): yield p
 
 
-def spiral(n):
-    dx, dy = 1, 0
-    x, y = 0, 0
-    arr = [[None] * n for _ in range(n)]
-    arr1 = {}
-    for i in range(1, n ** 2 + 1):
-        arr[x][y] = i
-        arr1[i] = (x, y)
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < n and 0 <= ny < n and not arr[nx][ny]:
-            x, y = nx, ny
-        else:
-            dx, dy = -dy, dx
-            x, y = x + dx, y + dy
-    return arr1
-
-
 def drawInfoLabel(gl, text, xx=0, yy=0, style=None, size=15, anchor_x='left', anchor_y='baseline', opacity=1, rotate=0,
                   label_color=(255, 255, 255), shadow_color=(56, 56, 56), scale=0, shadow=True):
     if style is None:
