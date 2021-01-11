@@ -28,6 +28,7 @@ class Player:
         self.cameraType = 1
         self.hp = -1
         self.bInAir = False
+        self.playerDead = False
         self.inventory = None
 
         self.lastPlayerPosOnGround = [0, 0, 0]
@@ -176,28 +177,21 @@ class Player:
             hp = self.hp
             if 3 < self.playerFallY:
                 # self.gl.sound.playSound("oof", 0.8)
-                hp -= 1
+                self.hp -= 1
                 if self.playerFallY < 10:
-                    hp -= 3
+                    self.hp -= 3
                 elif self.playerFallY < 16:
-                    hp -= 5
+                    self.hp -= 5
                 elif self.playerFallY < 23:
-                    hp -= 8
+                    self.hp -= 8
                 elif self.playerFallY < 30:
-                    hp -= 11
+                    self.hp -= 11
                 else:
-                    hp = 0
-                self.gl.blockSound.damageByBlock(self.gl.cubes.cubes[col2].name, hp)
-            self.hp = hp
-            if self.hp <= 0:
+                    self.hp = 0
+                self.gl.blockSound.damageByBlock(self.gl.cubes.cubes[col2].name, self.hp)
+            if self.hp <= 0 and not self.playerDead:
                 # Player dead
-                self.gl.deathScreen()
-                for i in self.inventory.inventory.items():
-                    for j in range(i[1][1]):
-                        self.gl.droppedBlock.addBlock((
-                            self.position[0] + randint(-2, 2), self.position[1], self.position[2] + randint(-2, 2)
-                        ), i[1][0])
-                    self.inventory.inventory[i[0]] = [i[1][0], 0]
+                self.dead()
 
             self.bInAir = False
             self.gl.particles.addParticle((col[0], col[1] - 1, col[2]),
@@ -205,6 +199,16 @@ class Player:
                                           direction="down",
                                           count=10)
         self.position = col
+
+    def dead(self):
+        self.playerDead = True
+        self.gl.deathScreen()
+        for i in self.inventory.inventory.items():
+            for j in range(i[1][1]):
+                self.gl.droppedBlock.addBlock((
+                    self.position[0] + randint(-2, 2), self.position[1], self.position[2] + randint(-2, 2)
+                ), i[1][0])
+            self.inventory.inventory[i[0]] = [i[1][0], 0]
 
     def mouseEvent(self, button):
         blockByVec = self.gl.cubes.hitTest(self.position, self.get_sight_vector())
@@ -250,10 +254,13 @@ class Player:
                     self.inventory.inventory[self.inventory.activeInventory][1] -= 1
 
     def collide(self, pos):
-        if pos[1] < -80:
-            self.dy = 0
-            self.lastPlayerPosOnGround = self.gl.startPlayerPos
-            return self.gl.startPlayerPos
+        if -90 > pos[1] > -9000:
+            if not self.playerDead:
+                self.hp -= 2
+                self.gl.blockSound.damageByBlock("ahh", 1)
+                if self.hp <= 0:
+                    # Player dead
+                    self.dead()
 
         p = list(pos)
         np = roundPos(pos)

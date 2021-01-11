@@ -1,3 +1,4 @@
+import gc
 import math
 import os
 from random import randint
@@ -10,13 +11,16 @@ from game.entity.Player import Player
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
 from game.Scene import Scene
+from game.world.Biomes import getBiomeByTemp
 from settings import *
 
 
 def respawn():
     pause()
     player.hp = 20
+    player.playerDead = False
     player.position = scene.startPlayerPos
+    player.lastPlayerPosOnGround = scene.startPlayerPos
 
 
 def quitToMenu():
@@ -45,6 +49,10 @@ def quitToMenu():
     scene.initScene()
 
     player.position = [0, -90, 0]
+    player.hp = -1
+    player.playerDead = False
+
+    gc.collect()
     mainFunction = drawMainMenu
 
 
@@ -138,19 +146,10 @@ def genWorld(mc):
 
     tex = gui.GUI_TEXTURES["options_background"]
     tex2 = gui.GUI_TEXTURES["black"]
-    if scene.worldGen.start == len(scene.worldGen.queue) or resizeEvent:
-        for x in range(0, scene.WIDTH, tex.width):
-            for y in range(0, scene.HEIGHT, tex.height):
-                tex.blit(x, y)
-                tex2.blit(x, y)
-        resizeEvent = False
-    else:
-        for x in range(-2, 2):
-            for y in range(-2, 2):
-                ix, iy = (scene.WIDTH // 2) + (x * tex.width), (scene.HEIGHT // 2) + (y * tex.height)
-
-                tex.blit(ix, iy)
-                tex2.blit(ix, iy)
+    for ix in range(0, scene.WIDTH, tex.width):
+        for iy in range(0, scene.HEIGHT, tex.height):
+            tex.blit(ix, iy)
+            tex2.blit(ix, iy)
 
     scene.genWorld()
     if scene.worldGen.start - len(scene.worldGen.queue) > chunkCnt:
@@ -254,7 +253,7 @@ gui = GUI(scene)
 blockSound = BlockSound(scene)
 player = Player(gl=scene)
 
-player.position = [0, -90, 0]
+player.position = [0, -9000, 0]
 
 scene.blockSound = blockSound
 scene.gui = gui
@@ -588,6 +587,7 @@ while True:
                                  f"XYZ: {round(player.x(), 3)} / {round(player.y(), 5)} / {round(player.z(), 3)}\n"
                                  f"Block: {round(player.x())} / {round(player.y())} / {round(player.z())}\n"
                                  f"Facing: {player.rotation[1]} / {player.rotation[0]}\n"
+                                 f"Biome: {getBiomeByTemp(scene.worldGen.perlinBiomes(player.x(), player.z()) * 3)}\n"
                                  f"Looking at: {scene.lookingAt}\n"
                                  f"Count of chunks: {scene.worldGen.start - len(scene.worldGen.queue)} "
                                  f"({scene.worldGen.start})",

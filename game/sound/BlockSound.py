@@ -26,6 +26,10 @@ class BlockSound:
         return blName
 
     def damageByBlock(self, blockName, hp):
+        self.cntr += 1
+        if self.cntr % 100 != 0 or self.cntr == 0:
+            return
+
         sound = self.gl.sound.SOUNDS["damage"]["fallbig"][0]
 
         if blockName.endswith("wool"):

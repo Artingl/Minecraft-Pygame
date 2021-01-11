@@ -38,10 +38,7 @@ class Scene:
         self.mskyColor = [128, 179, 255]
         self.nskyColor = [4, 6, 10]
         self.lightingColor = 200
-        self.startPlayerPos = [0, -90, 0]
         self.panorama = {}
-        self.drawCounter = 0
-        self.genTime = 1
         self.in_water = False
 
         self.resetScene()
@@ -59,6 +56,10 @@ class Scene:
         self.worldGen = worldGenerator(self, randint(434, 434343454))
         self.particles = Particles(self)
         self.destroy = DestroyBlock(self)
+
+        self.drawCounter = 0
+        self.genTime = 1
+        self.startPlayerPos = [0, -9000, 0]
 
     def loadPanoramaTextures(self):
         print("Loading panorama textures...")

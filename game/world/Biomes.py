@@ -1,4 +1,4 @@
-all_biomes = ["forest", "desert", "ocean", "taiga", "mountains"]
+all_biomes = ["forest", "desert", "ocean", "taiga", "mountains", "big_mountains"]
 
 
 def getBiomeByTemp(temp):
@@ -8,6 +8,8 @@ def getBiomeByTemp(temp):
         return all_biomes[1]  # Desert
     if 5 > temp > -5:
         return all_biomes[4]  # mountains
+    if 3 > temp > -3:
+        return all_biomes[5]  # mountains
 
     return all_biomes[3]  # Taiga
 
@@ -23,6 +25,8 @@ class Biomes:
             return "dirt"
         if self.biome == "forest" or self.biome == "taiga" or self.biome == "mountains":
             return "grass"
+        if self.biome == "big_mountains":
+            return "stone"
 
     def getBiomePlant(self):
         if self.biome == "desert":
@@ -35,7 +39,8 @@ class Biomes:
     def getBiomeDirt(self):
         if self.biome == "desert":
             return "sand"
-        if self.biome == "forest" or self.biome == "taiga" or self.biome == "mountains":
+        if self.biome == "forest" or self.biome == "taiga" or self.biome == "mountains" \
+                or self.biome == "big_mountains":
             return "dirt"
         if self.biome == "ocean":
             return "water"
@@ -47,3 +52,5 @@ class Biomes:
             return "stone"
         if self.biome == "ocean":
             return "water"
+        if self.biome == "big_mountains":
+            return "stone"

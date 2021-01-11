@@ -10,7 +10,7 @@ class worldGenerator:
     def __init__(self, glClass, seed=43242):
         self.seed = seed
         self.chunks = {}
-        self.worldPerlin = PerlinNoise(seed, mh=6)
+        self.worldPerlin = PerlinNoise(seed, mh=8)
         self.perlinBiomes = PerlinNoise(seed ** 2, mh=4)
         self.gl = glClass
 
@@ -45,18 +45,35 @@ class worldGenerator:
 
     def gen(self, xx, zz):
         sy = CHUNK_SIZE[1]
+        oldY = 0
 
         for x in range(xx, xx + CHUNK_SIZE[0]):
             for z in range(zz, zz + CHUNK_SIZE[2]):
-                y = self.worldPerlin(x, z) + sy
+                y = self.worldPerlin(x, z)
                 biomePerlin = self.perlinBiomes(x, z) * 3
                 activeBiome = Biomes(getBiomeByTemp(biomePerlin))
+                if activeBiome.biome == "mountains":
+                    if -3 < oldY - y < 3:
+                        y = int((oldY + y) / 2)
+                if activeBiome.biome == "big_mountains":
+                    if -3 < oldY - y < 3:
+                        y *= 2
+                        y = int((oldY + y) / 2)
+                oldY = y
+                y += sy
+                ch = 70
+                if activeBiome.biome in ["forest", "taiga"]:
+                    ch = 50
+
+                spawnTree = random.randint(0, ch) == 20 and y > sy - 5
 
                 self.add((x, y, z), activeBiome.getBiomeGrass())
-                if self.gl.startPlayerPos == [0, -90, 0]:
+                if self.gl.startPlayerPos == [0, -9000, 0] and not spawnTree:
                     self.gl.startPlayerPos = [x, y + 2, z]
+                    self.gl.player.position = [x, y + 2, z]
+                    self.gl.player.lastPlayerPosOnGround = [x, y + 2, z]
 
-                if random.randint(0, 120) == 20 and y > sy - 5:
+                if spawnTree:
                     self.spawnTree(x, y, z)
 
                 self.add((x, 0, z), "bedrock")
