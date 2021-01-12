@@ -23,7 +23,6 @@ class Button:
                       mp[0], mp[1]):
             self.button = self.gl.gui.GUI_TEXTURES["button_bg_hover"]
             if mc == 1:
-                pass
                 self.gl.sound.playGuiSound("click")
                 if self.event:
                     self.event()

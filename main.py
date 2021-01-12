@@ -4,14 +4,17 @@ import os
 from random import randint
 import pyglet
 from OpenGL.GL import *
-from functions import drawInfoLabel, getElpsTime
+from functions import drawInfoLabel, getElpsTime, translateSeed
 from game.GUI.Button import Button
+from game.GUI.Editarea import Editarea
 from game.GUI.GUI import GUI
+from game.GUI.Sliderbox import Sliderbox
 from game.entity.Player import Player
 from game.sound.BlockSound import BlockSound
 from game.sound.Sound import Sound
 from game.Scene import Scene
 from game.world.Biomes import getBiomeByTemp
+from game.world.worldGenerator import worldGenerator
 from settings import *
 
 
@@ -58,13 +61,19 @@ def quitToMenu():
 
 def showSettings():
     global mainFunction
-    mainFunction = genWorld
+    mainFunction = drawSettingsMenu
+
+
+def closeSettings():
+    global mainFunction
+    mainFunction = drawMainMenu
 
 
 def startNewGame():
     global mainFunction
     sound.musicPlayer.stop()
     sound.initMusic(True)
+    scene.worldGen = worldGenerator(scene, translateSeed(seedEditArea.text))
     mainFunction = genWorld
 
 
@@ -82,6 +91,42 @@ def deathScreen():
     scene.allowEvents["movePlayer"] = True
     scene.allowEvents["keyboardAndMouse"] = True
     mainFunction = drawDeathScreen
+
+
+def drawSettingsMenu(mc):
+    scene.set2d()
+
+    tex = gui.GUI_TEXTURES["options_background"]
+    tex2 = gui.GUI_TEXTURES["black"]
+    for ix in range(0, scene.WIDTH, tex.width):
+        for iy in range(0, scene.HEIGHT, tex.height):
+            tex.blit(ix, iy)
+            tex2.blit(ix, iy)
+    mp = pygame.mouse.get_pos()
+
+    # Volume slider box
+    soundVolumeSliderBox.x = scene.WIDTH // 2 - (soundVolumeSliderBox.bg.width // 2)
+    soundVolumeSliderBox.y = scene.HEIGHT // 2 - (soundVolumeSliderBox.bg.height // 2) - 80
+    soundVolumeSliderBox.update(mp)
+    #
+
+    # Seed edit area
+    seedEditArea.x = scene.WIDTH // 2 - (seedEditArea.bg.width // 2)
+    seedEditArea.y = scene.HEIGHT // 2 - (seedEditArea.bg.height // 2)
+    seedEditArea.update(mp, mc, keys)
+    #
+
+    # Close
+    closeSettingsButton.x = scene.WIDTH // 2 - (closeSettingsButton.button.width // 2)
+    closeSettingsButton.y = scene.HEIGHT // 2 - (closeSettingsButton.button.height // 2) + 160
+    closeSettingsButton.update(mp, mc)
+    #
+
+    sound.musicPlayer.set_volume(soundVolumeSliderBox.val / 100)
+    sound.volume = soundVolumeSliderBox.val / 100
+
+    pygame.display.flip()
+    clock.tick(MAX_FPS)
 
 
 def drawDeathScreen(mc):
@@ -142,7 +187,7 @@ def pauseMenu(mc):
 
 def genWorld(mc):
     global IN_MENU, PAUSE, resizeEvent
-    chunkCnt = 200
+    chunkCnt = 20
 
     tex = gui.GUI_TEXTURES["options_background"]
     tex2 = gui.GUI_TEXTURES["black"]
@@ -366,6 +411,7 @@ gui.GUI_TEXTURES = {
     "black": pyglet.resource.image("gui/gui_elements/black.png"),
     "red": pyglet.resource.image("gui/gui_elements/red.png"),
     "selected": pyglet.resource.image("gui/gui_elements/selected.png"),
+    "slider": pyglet.resource.image("gui/gui_elements/slider.png"),
 }
 
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -430,6 +476,10 @@ texture = gui.GUI_TEXTURES["selected"]
 texture.width *= 2
 texture.height *= 2
 
+texture = gui.GUI_TEXTURES["slider"]
+texture.width *= 2
+texture.height *= 2
+
 gui.addGuiElement("crosshair", (scene.WIDTH // 2 - 9, scene.HEIGHT // 2 - 9))
 
 player.inventory.initWindow()
@@ -455,6 +505,14 @@ optionsButton.setEvent(showSettings)
 quitButton.setEvent(exit)
 #
 
+# Settings objects
+closeSettingsButton = Button(scene, "Close", 0, 0)
+soundVolumeSliderBox = Sliderbox(scene, "Sound volume:", 100, 0, 0)
+seedEditArea = Editarea(scene, "World seed", 0, 0)
+
+closeSettingsButton.setEvent(closeSettings)
+#
+
 # Pause menu buttons
 resumeButton = Button(scene, "Back to Game", 0, 0)
 quitWorldButton = Button(scene, "Quit to title", 0, 0)
@@ -478,11 +536,13 @@ while True:
         if pygame.mouse.get_pressed(3)[0]:
             player.mouseEvent(1)
     mbclicked = None
+    keys = []
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
         if event.type == pygame.KEYDOWN:
+            keys.append(event.key)
             if event.key == pygame.K_F11:
                 if scene.WIDTH != monitor.current_w or scene.HEIGHT != monitor.current_h:
                     LAST_SAVED_RESOLUTION = [scene.WIDTH, scene.HEIGHT]
