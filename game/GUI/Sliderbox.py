@@ -17,7 +17,9 @@ class Sliderbox:
         self.slider = gl.gui.GUI_TEXTURES["slider"]
 
     def update(self, mp):
-        pos = ((self.bg.width - self.slider.width) / self.maxval) * self.val
+        pos = (self.bg.width / self.maxval) * self.val
+        if pos > self.bg.width - self.slider.width:
+            pos = self.bg.width - self.slider.width
         self.slider.x = self.x + pos
 
         if checkHover(self.x, self.y,
@@ -30,9 +32,9 @@ class Sliderbox:
                     pos = self.x + self.bg.width - self.slider.width
                 self.slider.x = pos
                 self.lastButtonClicked = True
-            elif self.lastButtonClicked:
-                self.gl.sound.playGuiSound("click")
-                self.lastButtonClicked = False
+        if self.lastButtonClicked and not pygame.mouse.get_pressed(3)[0]:
+            self.gl.sound.playGuiSound("click")
+            self.lastButtonClicked = False
 
         self.bg.blit(self.x, self.gl.HEIGHT - self.y - self.bg.height)
         self.slider.blit(self.slider.x, self.gl.HEIGHT - self.y - self.bg.height)

@@ -21,6 +21,9 @@ class Editarea:
                       mp[0], mp[1]):
             if mc == 1:
                 self.focused = True
+        else:
+            if mc == 1:
+                self.focused = False
         if self.focused:
             for i in keys:
                 if i == 8:
@@ -32,7 +35,7 @@ class Editarea:
                 elif i == 1073742053:
                     pass  # right shift
                 else:
-                    if len(self.text) > 15:
+                    if len(self.text) > 26:
                         continue
                     try:
                         self.text += chr(i)
@@ -58,5 +61,6 @@ class Editarea:
             if self.curFade[0] < 0:
                 self.curFade[1] = False
                 self.curFade[0] = 0
-            drawInfoLabel(self.gl, "_", xx=self.x + 10 + (len(self.text) * 12), yy=self.gl.HEIGHT - self.y - 25,
+            text = pyglet.text.Label(self.text, font_name='Minecraft Rus')
+            drawInfoLabel(self.gl, "_", xx=self.x + 12 + text.content_width, yy=self.gl.HEIGHT - self.y - 25,
                           style=[('', '')], size=12, opacity=self.curFade[0])

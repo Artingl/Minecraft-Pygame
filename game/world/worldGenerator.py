@@ -89,12 +89,12 @@ class worldGenerator:
         if random.randint(0, 5753) != random.randint(0, 1575):
             return
         r1 = random.randint(-1, 2)
-        r2 = random.randint(-2, 2)
+        r2 = random.randint(0, 2)
         ore = self.getOreByY(y)
 
         for xi in range(r1, r2):
-            for yi in range(random.randint(2, 5)):
-                for zi in range(random.randint(2, 5)):
+            for yi in range(r1):
+                for zi in range(r2):
                     self.add((x + xi, yi + y, zi + z), ore)
 
     def getOreByY(self, y):
