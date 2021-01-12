@@ -13,7 +13,7 @@ class CubeHandler:
         self.fluids = {}
         self.collidable = {}
 
-    def hitTest(self, p, vec, dist=6):
+    def hitTest(self, p, vec, dist=4):
         m = 8
         x, y, z = p
         dx, dy, dz = vec
