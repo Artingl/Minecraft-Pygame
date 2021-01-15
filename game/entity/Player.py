@@ -71,7 +71,7 @@ class Player:
                 self.rotation[0] = -90
 
             DX, DY, DZ = 0, 0, 0
-            minKd = 0.03
+            minKd = 0.08
 
             rotY = self.rotation[1] / 180 * math.pi
             dx, dz = (self.speed + self.acceleration - 0.008) * math.sin(rotY), \

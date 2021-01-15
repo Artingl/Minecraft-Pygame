@@ -36,20 +36,23 @@ class CubeHandler:
             x, y, z = x + dx, y + dy, z + dz
         return None, None
 
-    def show(self, v, t, i):
-        if self.color:
-            if i == "left" or i == "front":
-                clr = self.ns_color
-            if i == "right" or i == "back":
-                clr = self.ew_color
-            if i == "bottom":
-                clr = self.bottom_color
-            if i == "top":
-                clr = self.top_color
+    def show(self, v, t, i, clrC=None):
+        if not clrC:
+            if self.color:
+                if i == "left" or i == "front":
+                    clr = self.ns_color
+                if i == "right" or i == "back":
+                    clr = self.ew_color
+                if i == "bottom":
+                    clr = self.bottom_color
+                if i == "top":
+                    clr = self.top_color
+        else:
+            clr = clrC[i]
 
         return self.opaque.add(4, GL_QUADS, t, ('v3f', v), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)), clr)
 
-    def updateCube(self, cube):
+    def updateCube(self, cube, customColor=None):
         shown = any(cube.shown.values())
         if shown:
             if (cube.name != 'water' and cube.name != 'lava') and cube.p not in self.collidable:
@@ -64,7 +67,13 @@ class CubeHandler:
         f = 'left', 'right', 'bottom', 'top', 'back', 'front'
         for i in (0, 1, 2, 3, 4, 5):
             if cube.shown[f[i]] and not cube.faces[f[i]]:
-                cube.faces[f[i]] = show(v[i], cube.t[i], f[i])
+                cube.faces[f[i]] = show(v[i], cube.t[i], f[i], clrC=customColor)
+            elif customColor:
+                if cube.color[f[i]] != customColor[f[i]]:
+                    if cube.shown[f[i]]:
+                        self.removeFromScene(cube.p)
+                        cube.faces[f[i]] = show(v[i], cube.t[i], f[i], clrC=customColor)
+                    cube.color[f[i]] = customColor[f[i]]
 
     def set_adj(self, cube, adj, state):
         x, y, z = cube.p
@@ -123,3 +132,13 @@ class CubeHandler:
             if adj in self.cubes:
                 self.set_adj(self.cubes[adj], cube.p, True)
                 self.updateCube(self.cubes[adj])
+
+    def removeFromScene(self, p):
+        if p not in self.cubes:
+            return
+        cube = self.cubes[p]
+
+        for side, face in cube.faces.items():
+            if face:
+                face.delete()
+            cube.faces[side] = False

@@ -5,6 +5,7 @@ from OpenGL.GLU import *
 from pyglet.gl import *
 
 from functions import *
+from game.Lighting.Light import Light
 from game.Particles import Particles
 from game.blocks.DestroyBlock import DestroyBlock
 from game.blocks.droppedBlock import droppedBlock
@@ -33,11 +34,7 @@ class Scene:
         self.fov = FOV
         self.updateEvents = []
         self.entity = []
-        self.time = 200
-        self.skyColor = [128, 179, 255]
-        self.mskyColor = [128, 179, 255]
-        self.nskyColor = [4, 6, 10]
-        self.lightingColor = 200
+        self.skyColor = [128, 179, 255]  # [64, 89, 150]
         self.panorama = {}
         self.in_water = False
 
@@ -56,6 +53,7 @@ class Scene:
         self.worldGen = worldGenerator(self, randint(434, 434343454))
         self.particles = Particles(self)
         self.destroy = DestroyBlock(self)
+        self.light = Light(self)
 
         self.drawCounter = 0
         self.genTime = 1
@@ -176,12 +174,6 @@ class Scene:
             self.worldGen.genChunk(self.player)
 
     def updateScene(self):
-        # self.time += 1 * clock.get_fps() / 1000
-        # print(self.time)
-        if 200 < self.time < 320:
-            self.lightingColor = 200 - self.time + 200
-        if 500 < self.time < 620:
-            self.lightingColor = 700 - self.time
 
         self.genWorld()
         if self.in_water:
@@ -190,16 +182,14 @@ class Scene:
             glFogf(GL_FOG_END, 35)
         else:
             glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.7, 1, 1))
-            glFogf(GL_FOG_START, 60)
-            glFogf(GL_FOG_END, 120)
+            glFogf(GL_FOG_START, 10)
+            glFogf(GL_FOG_END, 80)
 
         self.set3d()
         glClearColor(self.skyColor[0] / 255, self.skyColor[1] / 255, self.skyColor[2] / 255, 1)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
-
-        glColor3d(self.lightingColor / 255, self.lightingColor / 255, self.lightingColor / 255)
 
         self.player.update()
         self.draw()
@@ -211,6 +201,7 @@ class Scene:
             i.update()
 
         self.particles.drawParticles()
+        # self.light.update()
 
         blockByVec = self.cubes.hitTest(self.player.position, self.player.get_sight_vector())
         if blockByVec[0]:

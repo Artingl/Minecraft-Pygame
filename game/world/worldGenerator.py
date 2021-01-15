@@ -11,7 +11,7 @@ class worldGenerator:
         self.seed = seed
         self.chunks = {}
         self.worldPerlin = PerlinNoise(seed, mh=8)
-        self.perlinBiomes = PerlinNoise(seed ** 2, mh=4)
+        self.perlinBiomes = PerlinNoise(seed ** 2, mh=10)
         self.gl = glClass
 
         q = []
