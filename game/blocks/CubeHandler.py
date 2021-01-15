@@ -5,6 +5,11 @@ from game.blocks.Cube import Cube
 
 
 class CubeHandler:
+    top_color = ('c3f', (1.0,) * 12)
+    ns_color = ('c3f', (0.8,) * 12)
+    ew_color = ('c3f', (0.6,) * 12)
+    bottom_color = ('c3f', (0.5,) * 12)
+
     def __init__(self, batch, block, opaque, alpha_textures, gl):
         self.batch, self.block, self.alpha_textures, self.opaque = batch, block, alpha_textures, opaque
         self.cubes = {}
@@ -12,6 +17,8 @@ class CubeHandler:
         self.gl = gl
         self.fluids = {}
         self.collidable = {}
+
+        self.color = True
 
     def hitTest(self, p, vec, dist=4):
         m = 8
@@ -30,7 +37,17 @@ class CubeHandler:
         return None, None
 
     def show(self, v, t, i):
-        return self.opaque.add(4, GL_QUADS, t, ('v3f', v), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)))
+        if self.color:
+            if i == "left" or i == "front":
+                clr = self.ns_color
+            if i == "right" or i == "back":
+                clr = self.ew_color
+            if i == "bottom":
+                clr = self.bottom_color
+            if i == "top":
+                clr = self.top_color
+
+        return self.opaque.add(4, GL_QUADS, t, ('v3f', v), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)), clr)
 
     def updateCube(self, cube):
         shown = any(cube.shown.values())
@@ -47,7 +64,7 @@ class CubeHandler:
         f = 'left', 'right', 'bottom', 'top', 'back', 'front'
         for i in (0, 1, 2, 3, 4, 5):
             if cube.shown[f[i]] and not cube.faces[f[i]]:
-                cube.faces[f[i]] = show(v[i], cube.t[i], i)
+                cube.faces[f[i]] = show(v[i], cube.t[i], f[i])
 
     def set_adj(self, cube, adj, state):
         x, y, z = cube.p

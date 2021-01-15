@@ -26,19 +26,19 @@ class Editarea:
                 self.focused = False
         if self.focused:
             for i in keys:
+                upperCase = False
+                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+                    upperCase = True
+
                 if i == 8:
                     self.text = self.text[0:-1]
                 elif i == 13 or i == 27:
                     self.focused = False
-                elif i == 1073742049:
-                    pass  # left shift
-                elif i == 1073742053:
-                    pass  # right shift
-                else:
+                elif i != 1073742049 and i != 1073742053:
                     if len(self.text) > 26:
                         continue
                     try:
-                        self.text += chr(i)
+                        self.text += chr(i).upper() if upperCase else chr(i)
                     except ValueError:
                         pass
 

@@ -34,6 +34,8 @@ class Player:
         self.lastPlayerPosOnGround = [0, 0, 0]
         self.playerFallY = 0
 
+        self.kW, self.kS, self.kA, self.kD = 0, 0, 0, 0
+
     def setCameraShake(self):
         if not self.canShake or self.shift > 0:
             return
@@ -69,6 +71,7 @@ class Player:
                 self.rotation[0] = -90
 
             DX, DY, DZ = 0, 0, 0
+            minKd = 0.03
 
             rotY = self.rotation[1] / 180 * math.pi
             dx, dz = (self.speed + self.acceleration - 0.008) * math.sin(rotY), \
@@ -77,29 +80,45 @@ class Player:
             key = pygame.key.get_pressed()
             if key[pygame.K_LCTRL]:
                 self.acceleration = 0.009
-            if key[pygame.K_w]:
+            if self.kW > 0 or key[pygame.K_w]:
                 DX += dx
                 DZ -= dz
                 self.setCameraShake()
+                if self.kW > 0:
+                    self.kW -= minKd
             else:
                 self.acceleration = 0
-            if key[pygame.K_s]:
+            if self.kS > 0 or key[pygame.K_s]:
                 DX -= dx
                 DZ += dz
                 self.setCameraShake()
                 self.acceleration = 0
-            if key[pygame.K_a]:
+                if self.kS > 0:
+                    self.kS -= minKd
+            if self.kA > 0 or key[pygame.K_a]:
                 DX -= dz
                 DZ -= dx
                 self.setCameraShake()
                 self.acceleration = 0
-            if key[pygame.K_d]:
+                if self.kA > 0:
+                    self.kA -= minKd
+            if self.kD > 0 or key[pygame.K_d]:
                 DX += dz
                 DZ += dx
                 self.setCameraShake()
                 self.acceleration = 0
+                if self.kD > 0:
+                    self.kD -= minKd
             if key[pygame.K_SPACE]:
                 self.jump()
+                if key[pygame.K_w]:
+                    self.kW = 1
+                if key[pygame.K_a]:
+                    self.kA = 1
+                if key[pygame.K_s]:
+                    self.kS = 1
+                if key[pygame.K_d]:
+                    self.kD = 1
             if key[pygame.K_LSHIFT]:
                 self.setShift(True)
                 self.acceleration = -0.01
@@ -269,7 +288,7 @@ class Player:
                 if not face[i]:
                     continue
                 d = (p[i] - np[i]) * face[i]
-                pad = 0 if i == 1 and face[i] < 0 else 0.25
+                pad = 0.25
                 if d < pad:
                     continue
                 for dy in (0, 1):
