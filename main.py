@@ -189,7 +189,7 @@ def pauseMenu(mc):
 
 def genWorld(mc):
     global IN_MENU, PAUSE, resizeEvent
-    chunkCnt = 1
+    chunkCnt = 220
 
     tex = gui.GUI_TEXTURES["options_background"]
     tex2 = gui.GUI_TEXTURES["black"]

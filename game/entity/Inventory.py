@@ -5,6 +5,7 @@ import pyglet
 from pyglet.gl import GL_QUADS
 
 from game.GUI.ModalWindow import ModalWindow
+from game.crafting import getCraftingItem
 from settings import *
 
 
@@ -23,7 +24,7 @@ class Inventory:
             old = not old
             self.heartAnimation.append([0, '-' if old else '+', randint(3, 8) / 10])
         for i in range(9 * 5 + 1):
-            self.inventory[i] = ["sand", 12]
+            self.inventory[i] = ["sand", 0]
             self.blocksLabel[i] = pyglet.text.Label("0",
                                                     font_name='Minecraft Rus',
                                                     color=(255, 255, 255, 255),
@@ -50,6 +51,8 @@ class Inventory:
         self.window.cellPositions[39] = [(x, y), None]
         x += 36
         self.window.cellPositions[40] = [(x, y), None]
+
+        self.window.cellPositions[41] = [(308, 56), None]  # TODO: crafting table in inventory
 
         x, y = 16, 168
         for i in range(9 * 3, 0, -1):
@@ -88,6 +91,13 @@ class Inventory:
                     self.draggingItem[1] -= 1
 
     def updateWindow(self, win, mousePos):
+        craftResult = getCraftingItem([
+            self.inventory[37][0] if self.inventory[37][1] else "",
+            self.inventory[38][0] if self.inventory[38][1] else "",
+            self.inventory[39][0] if self.inventory[39][1] else "",
+            self.inventory[40][0] if self.inventory[40][1] else "",
+        ])
+
         for i in self.window.cellPositions.items():
             xx, yy = self.window.cellPositions[i[0]][0][0], self.window.cellPositions[i[0]][0][1]
 

@@ -73,7 +73,7 @@ class worldGenerator:
                     self.gl.player.position = [x, y + 2, z]
                     self.gl.player.lastPlayerPosOnGround = [x, y + 2, z]
 
-                if spawnTree:
+                if spawnTree and activeBiome.biome in ["forest", "taiga"]:
                     self.spawnTree(x, y, z)
 
                 self.add((x, 0, z), "bedrock")

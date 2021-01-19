@@ -201,7 +201,7 @@ class Scene:
             i.update()
 
         self.particles.drawParticles()
-        # self.light.update()
+        self.light.update()
 
         blockByVec = self.cubes.hitTest(self.player.position, self.player.get_sight_vector())
         if blockByVec[0]:

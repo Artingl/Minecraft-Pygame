@@ -98,11 +98,11 @@ class droppedBlock:
             if i[1][3][0] > 0.1:
                 i[1][3][1] = "-"
 
+            if i[1][0][1] < -2:
+                self.blocks.pop(i[0])
+                continue
             yy = i[1][0][1]
             if roundPos((i[1][0][0], i[1][0][1], i[1][0][2])) not in self.gl.cubes.cubes:
                 yy -= 0.1
-                if y < -2:
-                    self.blocks.pop(i[0])
-                    continue
             self.blocks[i[0]][0] = (i[1][0][0], yy, i[1][0][2])
             self.blocks[i[0]][4] = i[1][4]

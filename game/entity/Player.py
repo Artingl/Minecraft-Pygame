@@ -207,6 +207,7 @@ class Player:
                     self.hp -= 11
                 else:
                     self.hp = 0
+                self.gl.blockSound.cntr = 99
                 self.gl.blockSound.damageByBlock(self.gl.cubes.cubes[col2].name, self.hp)
             if self.hp <= 0 and not self.playerDead:
                 # Player dead

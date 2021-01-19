@@ -18,6 +18,11 @@ class CubeHandler:
         self.fluids = {}
         self.collidable = {}
 
+        '''self.top_color = ('c3f', (0.1,) * 12)
+        self.ns_color = ('c3f', (0.1,) * 12)
+        self.ew_color = ('c3f', (0.1,) * 12)
+        self.bottom_color = ('c3f', (0.1,) * 12)'''
+
         self.color = True
 
     def hitTest(self, p, vec, dist=4):
@@ -71,7 +76,7 @@ class CubeHandler:
             elif customColor:
                 if cube.color[f[i]] != customColor[f[i]]:
                     if cube.shown[f[i]]:
-                        self.removeFromScene(cube.p)
+                        cube.faces[f[i]].delete()
                         cube.faces[f[i]] = show(v[i], cube.t[i], f[i], clrC=customColor)
                     cube.color[f[i]] = customColor[f[i]]
 
@@ -132,13 +137,3 @@ class CubeHandler:
             if adj in self.cubes:
                 self.set_adj(self.cubes[adj], cube.p, True)
                 self.updateCube(self.cubes[adj])
-
-    def removeFromScene(self, p):
-        if p not in self.cubes:
-            return
-        cube = self.cubes[p]
-
-        for side, face in cube.faces.items():
-            if face:
-                face.delete()
-            cube.faces[side] = False
