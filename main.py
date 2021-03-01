@@ -1,3 +1,4 @@
+import io
 import gc
 import math
 import os
@@ -326,7 +327,7 @@ scene.deathScreen = deathScreen
 scene.initScene()
 
 print("Loading sounds...")
-sound.BLOCKS_SOUND["pickUp"] = pygame.mixer.Sound("sounds/pick.mp3")
+sound.BLOCKS_SOUND["pickUp"] = pygame.mixer.Sound(io.FileIO("sounds/pick.mp3").read())
 
 print("Loading step sounds...")
 sound.BLOCKS_SOUND["step"] = {}
